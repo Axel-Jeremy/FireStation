@@ -1,2 +1,2 @@
 # FireStation
-Tugas AI Fire Station HC, SA, GA
+Tugas AI Fire Station Hill Climbing, Simulated Annealing, Genetic Algorithm
