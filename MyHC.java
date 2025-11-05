@@ -33,10 +33,11 @@ public class MyHC {
         }
 
         // for (int i = 0; i < banyakRumah; i++) {
-        //     // do bfs
-        //     int cost = 0;
-        //     totalCost += cost;
+        // // do bfs
+        // int cost = 0;
+        // totalCost += cost;
         // }
+        System.out.println(totalCost);
         return totalCost;
     }
 
@@ -46,12 +47,12 @@ public class MyHC {
         return row >= 0 && row < map.length &&
                 col >= 0 && col < map[0].length &&
                 !visited[row][col] &&
-                map[row][col] == 0; ///0 = kosong
+                map[row][col] == 0; /// 0 = kosong
     }
 
     // BFS function to find the shortest distance
     // from 's' to 'd' in the matrix
-    private int shortestPath(int xCol, int yCol, int[][] fireStation) {
+    private int shortestPath(int xRow, int yCol, int[][] fireStation) {
         int n = map.length;
         int m = map[0].length;
 
@@ -77,8 +78,8 @@ public class MyHC {
         // }
         // }
 
-        q.offer(new int[] { xCol, yCol, 0 });
-        visited[xCol][yCol] = true;
+        q.offer(new int[] { xRow, yCol, 0 });
+        visited[xRow][yCol] = true;
 
         // Standard BFS loop
         while (!q.isEmpty()) {
@@ -89,7 +90,7 @@ public class MyHC {
             int col = curr[1];
             int dist = curr[2];
 
-            if (!notChosenYet(xCol, yCol, fireStation)) { //kalo sampe firestation, return distancenya
+            if (!notChosenYet(row, col, fireStation)) { // kalo sampe firestation, return distancenya
                 return dist;
             }
 
@@ -124,9 +125,19 @@ public class MyHC {
     // alternatif mencari neighbor state di antara [-stepSize, stepSize]
     private int[][] getNeighbor(int x, int y, double stepSize) {
         int[][] neighborCoordinates = new int[4][2];
+
+        for (int i = 0; i < neighborCoordinates.length; i++) {
+            Arrays.fill(neighborCoordinates[i], -1);
+        }
+
         for (int i = 0; i < 4; i++) {
-            neighborCoordinates[i][0] = x + (int) (dRow[i] * stepSize);
-            neighborCoordinates[i][1] = y + (int) (dCol[i] * stepSize);
+            int stepX = (int) (dRow[i] * stepSize);
+            int stepY = (int) (dCol[i] * stepSize);
+
+            if (stepX + x < map.length && stepY + y < map[0].length) {
+                neighborCoordinates[i][0] = x + (int) (dRow[i] * stepSize);
+                neighborCoordinates[i][1] = y + (int) (dCol[i] * stepSize);
+            }
         }
         return neighborCoordinates;
     }
@@ -245,12 +256,12 @@ public class MyHC {
         for (int r = 1; r <= nRestarts; r++) { // ulangi nRestarts kali
             int[][] bestCurrentState = hillClimbing(step, iter); // state terbaik hasil HC
             double currentF = f(bestCurrentState); // f(x)-nya
-            if (currentF < bestF) { // simpan f(x) terbaik;
+            if (currentF < bestF && currentF > 0) { // simpan f(x) terbaik;
                 bestF = currentF;
                 bestState = bestCurrentState;
             }
         }
-        System.out.println(bestF);
+        // System.out.println(bestF);
         System.out.printf("p: %d average: %.5f\n", banyakFireStation, (bestF / (1.0 * banyakFireStation)));
         return bestState;
     }
@@ -292,12 +303,13 @@ public class MyHC {
         System.out.println("------------------");
 
         MyHC rrhc = new MyHC(map, p, h);
-        int[][] bestState = rrhc.randomRestartHC(20, 5.0, 5);
-        
-        for(int i = 0; i < bestState.length; i++){
-            for(int j = 0; j < bestState[i].length; j++){
+        int[][] bestState = rrhc.randomRestartHC(100, 20.0, 100);
+
+        for (int i = 0; i < bestState.length; i++) {
+            for (int j = 0; j < bestState[i].length; j++) {
                 System.out.print(bestState[i][j] + " ");
-            }System.out.println();
+            }
+            System.out.println();
         }
     }
 }
