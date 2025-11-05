@@ -246,18 +246,18 @@ public class MyHC {
                 } else if (rightF == minF) {
                     bestState = rightNeighborStates;
                     bestF = rightF;
-                    randPos[randomIdx][0] = neighborStates[0][0];
-                    randPos[randomIdx][1] = neighborStates[0][1];
+                    randPos[randomIdx][0] = neighborStates[1][0];
+                    randPos[randomIdx][1] = neighborStates[1][1];
                 } else if (bottomF == minF) {
                     bestState = bottomNeighborStates;
                     bestF = bottomF;
-                    randPos[randomIdx][0] = neighborStates[0][0];
-                    randPos[randomIdx][1] = neighborStates[0][1];
+                    randPos[randomIdx][0] = neighborStates[2][0];
+                    randPos[randomIdx][1] = neighborStates[2][1];
                 } else {
                     bestState = leftNeighborStates;
                     bestF = leftF;
-                    randPos[randomIdx][0] = neighborStates[0][0];
-                    randPos[randomIdx][1] = neighborStates[0][1];
+                    randPos[randomIdx][0] = neighborStates[3][0];
+                    randPos[randomIdx][1] = neighborStates[3][1];
                 }
             }
             // Jika tetangga tidak ada yang lebih baik
