@@ -110,7 +110,7 @@ public class MyHC {
             }
         }
 
-        // If no path to destination is found, return -1
+        // If no path to destination is found, return max value
         return Integer.MAX_VALUE;
     }
 
@@ -166,9 +166,9 @@ public class MyHC {
     private boolean notChosenYet(int x, int y, int[][] neighborCoordinates) {
         for (int i = 0; i < neighborCoordinates.length; i++) {
             if (x == neighborCoordinates[i][0] && y == neighborCoordinates[i][1])
-                return true;
+                return false;
         }
-        return false;
+        return true;
     }
 
     /**
