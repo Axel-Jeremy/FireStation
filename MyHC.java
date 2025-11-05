@@ -202,14 +202,37 @@ public class MyHC {
 
             // buat neighbor state-nya --> bisa gunakan getNeighbor()
             int[][] topNeighborStates = { neighborStates[0] };
-            int[][] rightNeighborStates = { neighborStates[1] };
-            int[][] bottomNeighborStates = { neighborStates[2] };
-            int[][] leftNeighborStates = { neighborStates[3] };
+            randPos[randomIdx][0] = neighborStates[0][0];
+            randPos[randomIdx][1] = neighborStates[0][1];
 
-            double topF = f(topNeighborStates); // hitung f()-nya
-            double rightF = f(rightNeighborStates);
-            double bottomF = f(bottomNeighborStates);
-            double leftF = f(leftNeighborStates);
+            double topF = f(randPos);
+
+            int[][] rightNeighborStates = { neighborStates[1] };
+            randPos[randomIdx][0] = neighborStates[1][0];
+            randPos[randomIdx][1] = neighborStates[1][1];
+
+            double rightF = f(randPos);
+
+            int[][] bottomNeighborStates = { neighborStates[2] };
+            randPos[randomIdx][0] = neighborStates[2][0];
+            randPos[randomIdx][1] = neighborStates[2][1];
+
+            double bottomF = f(randPos);
+
+            int[][] leftNeighborStates = { neighborStates[3] };
+            randPos[randomIdx][0] = neighborStates[3][0];
+            randPos[randomIdx][1] = neighborStates[3][1];
+
+            double leftF = f(randPos);
+
+            // int[][] rightNeighborStates = { neighborStates[1] };
+            // int[][] bottomNeighborStates = { neighborStates[2] };
+            // int[][] leftNeighborStates = { neighborStates[3] };
+
+            // double topF = f(topNeighborStates); // hitung f()-nya
+            // double rightF = f(rightNeighborStates);
+            // double bottomF = f(bottomNeighborStates);
+            // double leftF = f(leftNeighborStates);
 
             double minF = Math.min(Math.min(topF, rightF), Math.min(bottomF, leftF));
 
@@ -218,15 +241,23 @@ public class MyHC {
                 if (topF == minF) {
                     bestState = topNeighborStates;
                     bestF = topF;
+                    randPos[randomIdx][0] = neighborStates[0][0];
+                    randPos[randomIdx][1] = neighborStates[0][1];
                 } else if (rightF == minF) {
                     bestState = rightNeighborStates;
                     bestF = rightF;
+                    randPos[randomIdx][0] = neighborStates[0][0];
+                    randPos[randomIdx][1] = neighborStates[0][1];
                 } else if (bottomF == minF) {
                     bestState = bottomNeighborStates;
                     bestF = bottomF;
+                    randPos[randomIdx][0] = neighborStates[0][0];
+                    randPos[randomIdx][1] = neighborStates[0][1];
                 } else {
                     bestState = leftNeighborStates;
                     bestF = leftF;
+                    randPos[randomIdx][0] = neighborStates[0][0];
+                    randPos[randomIdx][1] = neighborStates[0][1];
                 }
             }
             // Jika tetangga tidak ada yang lebih baik
@@ -303,7 +334,7 @@ public class MyHC {
         System.out.println("------------------");
 
         MyHC rrhc = new MyHC(map, p, h);
-        int[][] bestState = rrhc.randomRestartHC(100, 20.0, 100);
+        int[][] bestState = rrhc.randomRestartHC(20, 20.0, 10);
 
         for (int i = 0; i < bestState.length; i++) {
             for (int j = 0; j < bestState[i].length; j++) {
