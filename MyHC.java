@@ -27,17 +27,13 @@ public class MyHC {
             for (int j = 0; j < map[i].length; j++) {
                 if (map[i][j] == 1) {
                     // do bfs
-                    totalCost += shortestPath(i, j, fireStation);
+                    int cost = shortestPath(i, j, fireStation);
+                    if (cost == -1) return Integer.MAX_VALUE;
+
+                    totalCost += cost;
                 }
             }
         }
-
-        // for (int i = 0; i < banyakRumah; i++) {
-        // // do bfs
-        // int cost = 0;
-        // totalCost += cost;
-        // }
-        System.out.println(totalCost);
         return totalCost;
     }
 
@@ -65,18 +61,6 @@ public class MyHC {
 
         // Queue to perform BFS: stores {row, col, distance}
         Queue<int[]> q = new LinkedList<>();
-
-        // Find the source 's' in the matrix
-        // and start BFS from it
-        // for (int i = 0; i < n; i++) {
-        // for (int j = 0; j < m; j++) {
-        // if (map[i][j] == 1) {
-        // q.offer(new int[] { i, j, 0 });
-        // visited[i][j] = true;
-        // break;
-        // }
-        // }
-        // }
 
         q.offer(new int[] { xRow, yCol, 0 });
         visited[xRow][yCol] = true;
@@ -112,7 +96,7 @@ public class MyHC {
         }
 
         // If no path to destination is found, return max value
-        return Integer.MAX_VALUE;
+        return -1;
     }
 
     // // pastikan x ada diantara MAX_X dan MIN_X;
@@ -155,11 +139,11 @@ public class MyHC {
         int y;
         for (int i = 0; i < banyakFireStation; i++) {
             x = rnd.nextInt(map.length);
-            y = rnd.nextInt(map.length);
+            y = rnd.nextInt(map[0].length);
 
             while (!isValidCoordinate(x, y) && !notChosenYet(x, y, stationCoordinates)) {
                 x = rnd.nextInt(map.length);
-                y = rnd.nextInt(map.length);
+                y = rnd.nextInt(map[0].length);
             }
 
             stationCoordinates[i][0] = x;
@@ -182,6 +166,13 @@ public class MyHC {
         return true;
     }
 
+    private boolean isNotOutOfBound(int[] arr) { // [x][y]
+        int x = arr[0];
+        int y = arr[1];
+
+        return x >= map.length && x < 0 && y >= map[0].length && y < 0;
+    }
+
     /**
      * Hill Climbing
      * 
@@ -201,63 +192,64 @@ public class MyHC {
             int[][] neighborStates = getNeighbor(randPos[randomIdx][0], randPos[randomIdx][1], stepSize);
 
             // buat neighbor state-nya --> bisa gunakan getNeighbor()
-            int[][] topNeighborStates = { neighborStates[0] };
-            randPos[randomIdx][0] = neighborStates[0][0];
-            randPos[randomIdx][1] = neighborStates[0][1];
+            int[][] topNeighborStates = null;
+            double topF = Integer.MAX_VALUE;
+            if (isNotOutOfBound(neighborStates[0])) {
+                topNeighborStates = randPos;
+                topNeighborStates[randomIdx][0] = neighborStates[0][0];
+                topNeighborStates[randomIdx][1] = neighborStates[0][1];
+                topF = f(topNeighborStates);
+            }
 
-            double topF = f(randPos);
+            int[][] rightNeighborStates = null;
+            double rightF = Integer.MAX_VALUE;
+            if (isNotOutOfBound(neighborStates[1])) {
+                rightNeighborStates = randPos;
+                rightNeighborStates[randomIdx][0] = neighborStates[1][0];
+                rightNeighborStates[randomIdx][1] = neighborStates[1][1];
+                rightF = f(rightNeighborStates);
+            }
 
-            int[][] rightNeighborStates = { neighborStates[1] };
-            randPos[randomIdx][0] = neighborStates[1][0];
-            randPos[randomIdx][1] = neighborStates[1][1];
+            int[][] bottomNeighborStates = null;
+            double bottomF = Integer.MAX_VALUE;
+            if (isNotOutOfBound(neighborStates[2])) {
+                bottomNeighborStates = randPos;
+                bottomNeighborStates[randomIdx][0] = neighborStates[2][0];
+                bottomNeighborStates[randomIdx][1] = neighborStates[2][1];
+                bottomF = f(bottomNeighborStates);
+            }
 
-            double rightF = f(randPos);
+            int[][] leftNeighborStates = null;
+            double leftF = Integer.MAX_VALUE;
+            if (isNotOutOfBound(neighborStates[3])) {
+                leftNeighborStates = randPos;
+                leftNeighborStates[randomIdx][0] = neighborStates[3][0];
+                leftNeighborStates[randomIdx][1] = neighborStates[3][1];
+                leftF = f(leftNeighborStates);
+            }
 
-            int[][] bottomNeighborStates = { neighborStates[2] };
-            randPos[randomIdx][0] = neighborStates[2][0];
-            randPos[randomIdx][1] = neighborStates[2][1];
-
-            double bottomF = f(randPos);
-
-            int[][] leftNeighborStates = { neighborStates[3] };
-            randPos[randomIdx][0] = neighborStates[3][0];
-            randPos[randomIdx][1] = neighborStates[3][1];
-
-            double leftF = f(randPos);
-
-            // int[][] rightNeighborStates = { neighborStates[1] };
-            // int[][] bottomNeighborStates = { neighborStates[2] };
-            // int[][] leftNeighborStates = { neighborStates[3] };
-
-            // double topF = f(topNeighborStates); // hitung f()-nya
-            // double rightF = f(rightNeighborStates);
-            // double bottomF = f(bottomNeighborStates);
-            // double leftF = f(leftNeighborStates);
+            if (topF < 0)
+                topF = Integer.MAX_VALUE;
+            if (rightF < 0)
+                rightF = Integer.MAX_VALUE;
+            if (bottomF < 0)
+                bottomF = Integer.MAX_VALUE;
+            if (leftF < 0)
+                leftF = Integer.MAX_VALUE;
 
             double minF = Math.min(Math.min(topF, rightF), Math.min(bottomF, leftF));
 
             // jika ada tetangga yang lebih baik, pindah ke tetangga tersebut
             if (minF < bestF) {
+                bestF = minF;
                 if (topF == minF) {
                     bestState = topNeighborStates;
-                    bestF = topF;
-                    randPos[randomIdx][0] = neighborStates[0][0];
-                    randPos[randomIdx][1] = neighborStates[0][1];
                 } else if (rightF == minF) {
                     bestState = rightNeighborStates;
-                    bestF = rightF;
-                    randPos[randomIdx][0] = neighborStates[1][0];
-                    randPos[randomIdx][1] = neighborStates[1][1];
                 } else if (bottomF == minF) {
                     bestState = bottomNeighborStates;
-                    bestF = bottomF;
-                    randPos[randomIdx][0] = neighborStates[2][0];
-                    randPos[randomIdx][1] = neighborStates[2][1];
                 } else {
                     bestState = leftNeighborStates;
-                    bestF = leftF;
-                    randPos[randomIdx][0] = neighborStates[3][0];
-                    randPos[randomIdx][1] = neighborStates[3][1];
                 }
             }
             // Jika tetangga tidak ada yang lebih baik
@@ -287,13 +279,14 @@ public class MyHC {
         for (int r = 1; r <= nRestarts; r++) { // ulangi nRestarts kali
             int[][] bestCurrentState = hillClimbing(step, iter); // state terbaik hasil HC
             double currentF = f(bestCurrentState); // f(x)-nya
-            if (currentF < bestF && currentF > 0) { // simpan f(x) terbaik;
+            System.out.println("currentF: " + currentF);
+            if (currentF < bestF) { // simpan f(x) terbaik;
                 bestF = currentF;
                 bestState = bestCurrentState;
             }
         }
-        // System.out.println(bestF);
-        System.out.printf("p: %d average: %.5f\n", banyakFireStation, (bestF / (1.0 * banyakFireStation)));
+        System.out.println("best:" + bestF);
+        System.out.printf("p: %d average: %.5f\n", banyakFireStation, ((1.0 * bestF) / (1.0 * banyakRumah)));
         return bestState;
     }
 
@@ -334,7 +327,7 @@ public class MyHC {
         System.out.println("------------------");
 
         MyHC rrhc = new MyHC(map, p, h);
-        int[][] bestState = rrhc.randomRestartHC(20, 20.0, 10);
+        int[][] bestState = rrhc.randomRestartHC(1000, 10.0, 100);
 
         for (int i = 0; i < bestState.length; i++) {
             for (int j = 0; j < bestState[i].length; j++) {
