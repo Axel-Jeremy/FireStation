@@ -46,7 +46,7 @@ public class MyHC {
         return row >= 0 && row < map.length &&
                 col >= 0 && col < map[0].length &&
                 !visited[row][col] &&
-                map[row][col] == 0;
+                map[row][col] == 0; ///0 = kosong
     }
 
     // BFS function to find the shortest distance
@@ -111,7 +111,7 @@ public class MyHC {
         }
 
         // If no path to destination is found, return -1
-        return -1;
+        return Integer.MAX_VALUE;
     }
 
     // // pastikan x ada diantara MAX_X dan MIN_X;
@@ -166,9 +166,9 @@ public class MyHC {
     private boolean notChosenYet(int x, int y, int[][] neighborCoordinates) {
         for (int i = 0; i < neighborCoordinates.length; i++) {
             if (x == neighborCoordinates[i][0] && y == neighborCoordinates[i][1])
-                return false;
+                return true;
         }
-        return true;
+        return false;
     }
 
     /**
@@ -251,7 +251,6 @@ public class MyHC {
             }
         }
         System.out.println(bestF);
-        System.out.println(banyakFireStation);
         System.out.printf("p: %d average: %.5f\n", banyakFireStation, (bestF / (1.0 * banyakFireStation)));
         return bestState;
     }
