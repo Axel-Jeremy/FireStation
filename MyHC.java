@@ -2,25 +2,18 @@ import java.util.*;
 
 public class MyHC {
     static final Random rnd = new Random();
-    static int MIN = Integer.MAX_VALUE; //
     // private int[][] firestationCoordinates;
     static int[][] map;
-    private int banyakFireStation;
-    private int banyakRumah;
+    static int banyakFireStation;
+    static int banyakRumah;
     // Direction vectors
     static int dRow[] = { -1, 0, 1, 0 };
     static int dCol[] = { 0, 1, 0, -1 };
 
-    public MyHC(int[][] map, int banyakFireStation, int banyakRumah) {
-        MyHC.map = map;
-        this.banyakFireStation = banyakFireStation;
-        this.banyakRumah = banyakRumah;
-    }
-
     // objective function (maximizing)
     // itung jarak terdekat (shortest path) dari setiap rumah ke firestation
     // terdekat, tambahin
-    private double f(int[][] fireStation) {
+    static double f(int[][] fireStation) {
         int totalCost = 0;
 
         for (int i = 0; i < map.length; i++) {
@@ -39,7 +32,7 @@ public class MyHC {
 
     // Function to check if the given cell is within bounds,
     // and not already visited
-    private boolean isValid(int row, int col, boolean[][] visited) {
+    static boolean isValid(int row, int col, boolean[][] visited) {
         return row >= 0 && row < map.length &&
                 col >= 0 && col < map[0].length &&
                 !visited[row][col] &&
@@ -48,7 +41,7 @@ public class MyHC {
 
     // BFS function to find the shortest distance
     // from 's' to 'd' in the matrix
-    private int shortestPath(int xRow, int yCol, int[][] fireStation) {
+    static int shortestPath(int xRow, int yCol, int[][] fireStation) {
         int n = map.length;
         int m = map[0].length;
 
@@ -99,15 +92,8 @@ public class MyHC {
         return -1;
     }
 
-    // // pastikan x ada diantara MAX_X dan MIN_X;
-    // static double clamp(double x) {
-    // x = Math.max(MIN_X, x);
-    // x = Math.min(x, MAX_X);
-    // return x;
-    // }
-
     // alternatif mencari neighbor state di antara [-stepSize, stepSize]
-    private int[][] getNeighbor(int x, int y, double stepSize) {
+    static int[][] getNeighbor(int x, int y, double stepSize) {
         int[][] neighborCoordinates = new int[4][2];
 
         for (int i = 0; i < neighborCoordinates.length; i++) {
@@ -127,7 +113,7 @@ public class MyHC {
     }
 
     // generate random coordinate buat koordinat si firestation
-    private int[][] generateRandomCoordinates() {
+    static int[][] generateRandomCoordinates() {
         int[][] stationCoordinates = new int[banyakFireStation][2];
         for (int i = 0; i < stationCoordinates.length; i++) {
             Arrays.fill(stationCoordinates[i], -1);
@@ -152,13 +138,13 @@ public class MyHC {
         return stationCoordinates;
     }
 
-    private boolean isValidCoordinate(int x, int y) {
+    static boolean isValidCoordinate(int x, int y) {
         if (map[x][y] == 0)
             return true;
         return false;
     }
 
-    private boolean notChosenYet(int x, int y, int[][] neighborCoordinates) {
+    static boolean notChosenYet(int x, int y, int[][] neighborCoordinates) {
         for (int i = 0; i < neighborCoordinates.length; i++) {
             if (x == neighborCoordinates[i][0] && y == neighborCoordinates[i][1])
                 return false;
@@ -166,7 +152,7 @@ public class MyHC {
         return true;
     }
 
-    private boolean isNotOutOfBound(int[] arr) { // [x][y]
+    static boolean isNotOutOfBound(int[] arr) { // [x][y]
         int x = arr[0];
         int y = arr[1];
 
@@ -180,7 +166,7 @@ public class MyHC {
      * @param maxIter  iterasi maksimum
      * @return x dengan f(x) terbesar
      */
-    private int[][] hillClimbing(double stepSize, int maxIter) {
+    static int[][] hillClimbing(double stepSize, int maxIter) {
         int[][] randPos = generateRandomCoordinates(); // posisi awal: random
         // System.out.printf("Initial posistion: %.6f\n", randPos);
 
@@ -268,7 +254,7 @@ public class MyHC {
      * @param runs      iterasi maksimum
      * @return x dengan f(x) terbesar
      */
-    private int[][] randomRestartHC(int nRestarts, double step, int iter) {
+    static int[][] randomRestartHC(int nRestarts, double step, int iter) {
         int[][] bestState = new int[banyakFireStation][2];
         for (int i = 0; i < bestState.length; i++) {
             Arrays.fill(bestState[i], -1);
@@ -297,7 +283,7 @@ public class MyHC {
         int n = sc.nextInt();
         int m = sc.nextInt();
 
-        int[][] map = new int[m][n];
+        map = new int[m][n];
         boolean[][] visited = new boolean[m][n];
 
         // banyak fire station
@@ -326,14 +312,17 @@ public class MyHC {
 
         System.out.println("------------------");
 
-        MyHC rrhc = new MyHC(map, p, h);
-        int[][] bestState = rrhc.randomRestartHC(1000, 10.0, 100);
+        banyakFireStation = p;
+        banyakRumah = h;
+        int[][] bestState = randomRestartHC(1000, 10.0, Integer.parseInt(args[0]));
 
+        System.out.println("Best all fire station coordinates (x, y):");
         for (int i = 0; i < bestState.length; i++) {
+            System.out.print("(");
             for (int j = 0; j < bestState[i].length; j++) {
                 System.out.print(bestState[i][j] + " ");
             }
-            System.out.println();
+            System.out.println(")");
         }
     }
 }
