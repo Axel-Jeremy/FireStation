@@ -212,7 +212,6 @@ public class MySA {
 				T *= cooling;
 				continue;
 			}
-			
 
 			int[][] successorFireStation = null;
 			int randomSuccessorIdx = rnd.nextInt(4);
@@ -296,7 +295,7 @@ public class MySA {
 		double cooling_rate = Double.parseDouble(args[1]);
 		double stopping_temp = Double.parseDouble(args[2]);
 		double stepSize = Double.parseDouble(args[3]);
-		int runs = Integer.parseInt(args[3]);
+		int runs = Integer.parseInt(args[4]);
 		int i = 1;
 
 		int[][] bestState = generateRandomCoordinates();
