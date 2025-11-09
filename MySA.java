@@ -22,7 +22,7 @@ public class MySA {
 					// do bfs
 					int cost = shortestPath(i, j, fireStation);
 					if (cost == -1)
-						return Integer.MIN_VALUE;
+						return Integer.MAX_VALUE;
 						
 					totalCost += cost;
 				}
@@ -153,7 +153,7 @@ public class MySA {
 		int x = arr[0];
 		int y = arr[1];
 
-		return x >= map.length && x < 0 && y >= map[0].length && y < 0;
+        return x < map.length && x >= 0 && y < map[0].length && y >= 0;
 	}
 
 	// // pastikan x ada diantara MAX_X dan MIN_X;
@@ -307,13 +307,13 @@ public class MySA {
 			int[][] currentState = simulatedAnnealing(starting_temp, cooling_rate, stopping_temp, stepSize);
 			double currentF = f(currentState); // hitung f(x) dari hasil SA
 			System.out.printf("Simulated Annealing result:\n");
-			System.out.printf("Current f = %.5f\n", currentF);
+			System.out.printf("Current f = %.5f\n", ((1.0 * currentF) / (1.0 * banyakRumah)));
 
 			System.out.println("Current fire station coordinates (x, y):");
 			for (int k = 0; k < currentState.length; k++) {
 				System.out.print("(");
 				for (int j = 0; j < currentState[k].length; j++) {
-					System.out.print(currentState[k][j] + " ");
+					System.out.print(currentState[k][j] + "");
 				}
 				System.out.println(")");
 			}
@@ -326,7 +326,7 @@ public class MySA {
 		}
 
 		System.out.printf("Simulated Annealing BEST:\n");
-		System.out.printf("Best f = %.5f\n", bestF);
+		System.out.printf("Best f = %.5f\n", ((1.0 * bestF) / (1.0 * banyakRumah)));
 
 		System.out.println("Best fire station coordinates (x, y):");
 		for (int k = 0; k < bestState.length; k++) {
