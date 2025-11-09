@@ -152,8 +152,13 @@ public class MySA {
 	static boolean isNotOutOfBound(int[] arr) { // [x][y]
 		int x = arr[0];
 		int y = arr[1];
+<<<<<<< HEAD
 
         return x < map.length && x >= 0 && y < map[0].length && y >= 0;
+=======
+		// Cek tidak ada yg d batas negatif (atas), tidak lewatin batas bawah dan kanan serta kiri peta
+		return x >= 0 && x < map.length && y >= 0 && y < map[0].length;
+>>>>>>> 6d2e0c13aa251b337c42a7fbd10dedd36be73801
 	}
 
 	// // pastikan x ada diantara MAX_X dan MIN_X;
@@ -207,12 +212,11 @@ public class MySA {
 				leftNeighborStates[randomIdx][1] = neighborStates[3][1];
 			}
 
-			// Worst Case 4 neighbors null, gada neighbors yang valid buat lanjut
-			// if (topNeighborStates == null
-			// 		&& rightNeighborStates == null
-			// 		&& bottomNeighborStates == null
-			// 		&& leftNeighborStates == null)
-			// 	continue;
+			// keluarkan firestation ketika terpojok
+			if (topNeighborStates == null && rightNeighborStates == null && bottomNeighborStates == null && leftNeighborStates == null){
+				T *= cooling;
+				continue;
+			}
 
 			int[][] successorFireStation = null;
 			int randomSuccessorIdx = rnd.nextInt(4);
@@ -233,17 +237,17 @@ public class MySA {
 					case 3:
 						successorFireStation = leftNeighborStates;
 						break;
-					default:
-						break;
 				}
 			}
 
 			double successorF = f(successorFireStation); // hitung f()-nya
 			double deltaE = successorF - currentF; // hitung delta
-			if ((deltaE > 0) || (rnd.nextDouble() <= Math.exp(deltaE / T))) { // kriteria acceptance
+			// karena cari minimal total cost jadi deltaE < 0
+			if ((deltaE < 0) || (rnd.nextDouble() <= Math.exp(deltaE / T))) { // kriteria acceptance
 				currentState = successorFireStation; // pindah karena lebih baik
 				currentF = successorF;
-				if (currentF > bestF) { // simpan terbaik
+				// update current state dan f(current) jadi lebih kecil
+				if (currentF < bestF) { // simpan terbaik
 					bestF = currentF;
 					bestState = currentState;
 				}
@@ -339,3 +343,7 @@ public class MySA {
 		System.out.println("----------------------------------------------------------");
 	}
 }
+
+// Yg davin ubah tadi di bagian:
+// 1. If isNotOutOfBound() jadi (deltaE < 0) sblmnya (deltaE > 0)
+// 2. ngebalikin yg if topNeighborStates == null dkk nya
