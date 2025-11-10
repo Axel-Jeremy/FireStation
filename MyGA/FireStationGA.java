@@ -1,7 +1,7 @@
 import java.util.Random;
 import java.util.ArrayList;
 
-public class KnapsackGA {
+public class FireStationGA {
     Random MyRand;
     public int maxPopulationSize;
     public double elitismPct;
@@ -10,7 +10,7 @@ public class KnapsackGA {
     public int totalGeneration;
     int maxCapacity;
 
-    public KnapsackGA(Random MyRand, int totalGeneration, int maxPopulationSize, double elitismPct,
+    public FireStationGA(Random MyRand, int totalGeneration, int maxPopulationSize, double elitismPct,
             double crossoverRate, double mutationRate, int maxCapacity) {
         this.MyRand = MyRand; // MyRand adalah random generator yang dikirim dari luar
         this.totalGeneration = totalGeneration;
