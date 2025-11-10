@@ -8,26 +8,23 @@ public class KnapsackGA {
     public double crossoverRate;
     public double mutationRate;
     public int totalGeneration;
-    ArrayList<Item> listOfItems;
     int maxCapacity;
 
     public KnapsackGA(Random MyRand, int totalGeneration, int maxPopulationSize, double elitismPct,
-            double crossoverRate, double mutationRate, ArrayList<Item> listOfItems, int maxCapacity) {
+            double crossoverRate, double mutationRate, int maxCapacity) {
         this.MyRand = MyRand; // MyRand adalah random generator yang dikirim dari luar
         this.totalGeneration = totalGeneration;
         this.maxPopulationSize = maxPopulationSize;
         this.elitismPct = elitismPct;
         this.crossoverRate = crossoverRate;
         this.mutationRate = mutationRate;
-        this.listOfItems = listOfItems;
         this.maxCapacity = maxCapacity;
     }
 
     public Individual run() {
         int generation = 1;
         // buat populasi awal
-        Population currentPop = new Population(MyRand, this.listOfItems, this.maxCapacity, this.maxPopulationSize,
-                this.elitismPct);
+        Population currentPop = new Population(MyRand, this.maxCapacity, this.maxPopulationSize, this.elitismPct);
         currentPop.randomPopulation(); // populasi diisi individu random
         currentPop.computeAllFitnesses(); // hitung seluruh fitnessnya
 
@@ -36,15 +33,23 @@ public class KnapsackGA {
             // buat populasi awal dengan elitism, bbrp individu terbaik dari populasi
             // ebelumnya sudah masuk
             Population newPop = currentPop.getNewPopulationWElit();
-            while (newPop.isFilled() == false) { // selain elitism, sisanya diis dengan crossover
+            while (newPop.isFilled() == false) { // selain elitism, sisanya diisi dengan crossover
                 Individual[] parents = currentPop.selectParent(); // pilih parent
                 if (this.MyRand.nextDouble() < this.crossoverRate) { // apakah terjadi kawin silang?
-                    Individual child = parents[0].doCrossover(parents[1]); // jika ya, crossover kedua parent untuk
+                    Individual[] child = parents[0].doCrossover(parents[1]); // jika ya, crossover kedua parent untuk
                                                                            // mendapatkan satu anak
-                    if (this.MyRand.nextDouble() < this.mutationRate) { // apakah terjadi mutasi?
-                        child.doMutation();
+                    for(int i = 0; i < child.length; i++){
+                        if (this.MyRand.nextDouble() < this.mutationRate) { // apakah terjadi mutasi?
+                            child[i].doMutation();
+                        }
                     }
-                    newPop.addIndividual(child); // masukkan anak ke dalam populasi
+
+                    for(int i = 0; i < child.length; i++){
+                        if (this.MyRand.nextDouble() < this.mutationRate) { // apakah terjadi mutasi?
+                            newPop.addIndividual(child[i]); // masukkan anak ke dalam populasi
+                        }
+                    }
+                    
                 }
             }
             generation++; // sudah ada generasi baru
@@ -62,5 +67,4 @@ public class KnapsackGA {
         // or by running time
         // or population not changed
     }
-
 }

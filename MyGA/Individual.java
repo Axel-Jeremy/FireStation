@@ -20,7 +20,11 @@ public class Individual implements Comparable<Individual> {
         this.fitness = Integer.MAX_VALUE;
         this.parentProbability = 0;
         this.banyakFireStation = banyakFireStation;
-        this.map = map;
+    }
+
+    //Method untuk Peta yang akan digunakan
+    public void setMap(int[][] map){
+        Individual.map = map;
     }
 
     // membuat individu baru berdasarkan kromosom dari luar
