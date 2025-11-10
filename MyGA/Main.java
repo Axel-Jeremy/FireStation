@@ -64,7 +64,7 @@ public class Main{
 	        	elitismPct = sc.nextDouble();		//skala 0-1
 	        } catch (Exception e) { e.printStackTrace();}
 			//gen (random generator) dikirim ke algogen, jadi hanya menggunakan satu generator untuk keseluruhan algo
-		    KnapsackGA ga = new KnapsackGA(gen,totalGeneration,maxPopulationSize,elitismPct, crossoverRate,
+		    FireStationGA ga = new FireStationGA(gen,totalGeneration,maxPopulationSize,elitismPct, crossoverRate,
 	                                        mutationRate, maxCapacity);
 	        Individual res = ga.run();	//ambil yg terbaik
 
