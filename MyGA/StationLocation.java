@@ -2,7 +2,7 @@ public class StationLocation {
     public int x;
     public int y;
 
-    public StationLocation(int x, int y){
+    public StationLocation(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -22,9 +22,9 @@ public class StationLocation {
     public void setY(int y) {
         this.y = y;
     }
-    
+
     @Override
-    public String toString(){
+    public String toString() {
         return String.format("(%d, %d)\n", this.x, this.y);
     }
 }

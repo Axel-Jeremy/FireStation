@@ -152,13 +152,9 @@ public class MySA {
 	static boolean isNotOutOfBound(int[] arr) { // [x][y]
 		int x = arr[0];
 		int y = arr[1];
-<<<<<<< HEAD
 
-        return x < map.length && x >= 0 && y < map[0].length && y >= 0;
-=======
 		// Cek tidak ada yg d batas negatif (atas), tidak lewatin batas bawah dan kanan serta kiri peta
 		return x >= 0 && x < map.length && y >= 0 && y < map[0].length;
->>>>>>> 6d2e0c13aa251b337c42a7fbd10dedd36be73801
 	}
 
 	// // pastikan x ada diantara MAX_X dan MIN_X;
