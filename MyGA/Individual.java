@@ -44,6 +44,17 @@ public class Individual implements Comparable<Individual> {
         // [x2][y2] - coord firestation2
 
         Arrays.fill(stationCoordinates, new StationLocation(-1,-1));
+        // System.out.println("====================================");
+
+        // for (int i = 0; i < stationCoordinates.length; i++) {
+        //     System.out.println(stationCoordinates[i].x + " " + stationCoordinates[i].y);
+        // }
+        // try {
+        //     Thread.sleep(5000);
+        // } catch (InterruptedException e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // }
 
         int x;
         int y;
@@ -51,9 +62,10 @@ public class Individual implements Comparable<Individual> {
             x = MyRand.nextInt(map.length);
             y = MyRand.nextInt(map[0].length);
 
-            while (!isValidCoordinate(x, y) && !notChosenYet(x, y, stationCoordinates)) {
+            while (!isValidCoordinate(x, y)) {
                 x = MyRand.nextInt(map.length);
                 y = MyRand.nextInt(map[0].length);
+                //System.out.println(x + " " + y);
             }
 
             StationLocation randomLocation = new StationLocation(x, y);

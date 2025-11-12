@@ -89,24 +89,16 @@ public class Main {
 				bestRun = res;
 			}
 
-			double rata2Cost;
-
-			if (res.fitness == Integer.MAX_VALUE || h == 0) {
-				rata2Cost = 0;
-			} else {
-				rata2Cost = (res.fitness * 1.0 / h);
-			}
-			total += rata2Cost;
-		}
 		// SOUT
+		double rata2 = 0;
 		if (bestRun != null) {
-			double rata2 = 0;
-			if (bestRun.fitness != Integer.MAX_VALUE && h > 0) {
+			// if (bestRun.fitness != Integer.MAX_VALUE) {
 				rata2 = bestRun.fitness * 1.0 / h;
+				System.out.println("MASUK GA?");
 			}
 
 			// Fire Station dan Rata rata
-			System.out.printf("%d %5.f \n", p, rata2);
+			System.out.printf("%d %.5f \n", p, rata2);
 
 			// Koordinat Fire Station
 			for (int i = 0; i < p; i++){
