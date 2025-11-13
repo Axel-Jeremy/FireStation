@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -42,71 +43,48 @@ public class Main {
 
 		int loop = Integer.parseInt(args[0]); // berapa kali algogen dijalankan
 		double total = 0;
-		Random init = new Random(); // random generator untuk membuat seed
-		Individual bestRun = null; // menyimpan individu terbaik
+		Random init = new Random(); 	//random generator untuk membuat seed
+    	for (int ct=1;ct<=loop;ct++) {
+			//System.out.println("===================\nRun: "+ct);
+    		long seed = init.nextLong()%1000; 		//simpan seed sebagai seed untuk random generator
+			//System.out.println("Seed: "+seed);
+			Random gen = new Random(seed);	//random generator untuk algogen-nya
+			// System.out.println("PPPP" + p);
+	    	int maxCapacity=p, totalGeneration=0, maxPopulationSize=0;
+	    	double crossoverRate=0.0, mutationRate=0.0, elitismPct=0.0;
+	    	//ArrayList<Item> listOfItems = new ArrayList<Item>();
+	    	// try {	//baca data item knapsack
+	        // 	sc = new Scanner(new File("input.txt"));
+	        // 	maxCapacity = sc.nextInt();
+	        // 	for (int i=1;i<=32;i++) {
+	        //     	listOfItems.add(new Item(sc.nextInt(), sc.nextInt(),sc.next()));
+	        // 	}
+	        // } catch (FileNotFoundException e) { e.printStackTrace();}
+	        try {	//baca data parameter genetik
+	        	sc = new Scanner(new File("param.txt"));
+	        	totalGeneration = sc.nextInt();
+	        	maxPopulationSize = sc.nextInt();
+	        	crossoverRate = sc.nextDouble();	//skala 0-1
+	        	mutationRate = sc.nextDouble();		//skala 0-1
+	        	elitismPct = sc.nextDouble();		//skala 0-1
+	        } catch (Exception e) { e.printStackTrace();}
+			//gen (random generator) dikirim ke algogen, jadi hanya menggunakan satu generator untuk keseluruhan algo
+		    FireStationGA ga = new FireStationGA(gen,totalGeneration,maxPopulationSize,elitismPct, crossoverRate,
+	                                        mutationRate, maxCapacity);
+			Individual.setMap(map);
+			Individual.setBanyakFirestation(p);
+	        Individual res = ga.run();	//ambil yg terbaik
 
-		for (int ct = 1; ct <= loop; ct++) {
-			// System.out.println("===================\nRun: "+ct);
-			long seed = init.nextLong() % 1000; // simpan seed sebagai seed untuk random generator
-			// System.out.println("Seed: "+seed);
-			Random gen = new Random(seed); // random generator untuk algogen-nya
-			int maxCapacity = 0;
-			int totalGeneration = 0;
-			int maxPopulationSize = 0;
-			double crossoverRate = 0.0;
-			double mutationRate = 0.0;
-			double elitismPct = 0.0;
-
-			// ArrayList<Item> listOfItems = new ArrayList<Item>();
-			// try { //baca data item knapsack
-			// sc = new Scanner(new File("input.txt"));
-			// maxCapacity = sc.nextInt();
-			// for (int i=1;i<=32;i++) {
-			// listOfItems.add(new Item(sc.nextInt(), sc.nextInt(),sc.next()));
-			// }
-			// } catch (FileNotFoundException e) { e.printStackTrace();}
-
-			try { // baca data parameter genetik
-				sc = new Scanner(new File("param.txt"));
-				totalGeneration = sc.nextInt();
-				maxPopulationSize = sc.nextInt();
-				crossoverRate = sc.nextDouble(); // skala 0-1
-				mutationRate = sc.nextDouble(); // skala 0-1
-				elitismPct = sc.nextDouble(); // skala 0-1
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			// gen (random generator) dikirim ke algogen, jadi hanya menggunakan satu
-			// generator untuk keseluruhan algo
-
-			FireStationGA ga = new FireStationGA(gen, totalGeneration, maxPopulationSize, elitismPct, crossoverRate,
-					mutationRate, p);
-			Individual res = ga.run(); // ambil yg terbaik
-
-			// simpan individu terbaik
-			if (bestRun == null || res.fitness < bestRun.fitness) {
-				bestRun = res;
-			}
-
-		// SOUT
-		double rata2 = 0;
-		if (bestRun != null) {
-			// if (bestRun.fitness != Integer.MAX_VALUE) {
-				rata2 = bestRun.fitness * 1.0 / h;
-				System.out.println("MASUK GA?");
-			}
-
-			// Fire Station dan Rata rata
-			System.out.printf("%d %.5f \n", p, rata2);
-
-			// Koordinat Fire Station
-			for (int i = 0; i < p; i++){
-				int row = bestRun.chromosome[i].getX();
-				int col = bestRun.chromosome[i].getY();
-
-				System.out.printf("%d %d \n", row, col);
-			}
+			//???
+			// double fit = (1.0*res.fitness)/13692887; //kebetulan optimalnya tahu, tapi intinya untuk mencari tahu seberapa bagus fitnesnya
+			// total = total + fit;
+	        // System.out.printf("%2d: Acc = %.3f (%d) Seed: %d\n",ct,(1.0*res.fitness)/13692887,res.fitness,seed);
+	        //for (int i=0;i<Integer.SIZE;i++) {
+	        //    int bit = res.chromosome&(1<<i);
+	        //    System.out.println(i+" :"+((bit>0)?"1":"0"));
+			//}
+			System.out.println("current: " + res.fitness);
+			total += res.fitness;
 		}
 	}
 }
