@@ -4,8 +4,7 @@ import java.util.Queue;
 import java.util.Random;
 
 public class Individual implements Comparable<Individual> {
-    public StationLocation[] chromosome; // kromosom adalah array of bit, integer diperlakukan seperti array berisi
-                                         // (bit) 0/1
+    public StationLocation[] chromosome; // array of location
     public int fitness; // nilai fitnessnya
     public Random MyRand; // random generator dikirim dari luar untuk membuat invididu acal
     public double parentProbability; // probabilitas individu ini terpilih sbg parent
@@ -13,18 +12,13 @@ public class Individual implements Comparable<Individual> {
     static int[][] map;
 
     // membuat individu acak
-    public Individual(Random MyRand, int banyakFireStation, int[][] map) {
+    public Individual(Random MyRand, int banyakFireStation) {
         this.MyRand = MyRand;
+        this.banyakFireStation = banyakFireStation;
         this.chromosome = generateRandomCoordinates();
         // System.out.println(chromosome);
         this.fitness = Integer.MAX_VALUE;
         this.parentProbability = 0;
-        this.banyakFireStation = banyakFireStation;
-    }
-
-    //Method untuk Peta yang akan digunakan
-    public void setMap(int[][] map){
-        Individual.map = map;
     }
 
     // membuat individu baru berdasarkan kromosom dari luar
@@ -33,15 +27,34 @@ public class Individual implements Comparable<Individual> {
         this.chromosome = chromosome;
         this.fitness = setFitness(chromosome);
         this.parentProbability = 0;
+        this.banyakFireStation = chromosome.length;
+    }
+
+    // Method untuk Peta yang akan digunakan
+    public static void setMap(int[][] map) {
+        Individual.map = map;
     }
 
     // generate random coordinate buat koordinat si firestation
     public StationLocation[] generateRandomCoordinates() {
         StationLocation[] stationCoordinates = new StationLocation[banyakFireStation];
-        Arrays.fill(stationCoordinates, -1);
+        //Arrays.fill(stationCoordinates, -1);
 
         // [x1][y1] - coord firestation1
         // [x2][y2] - coord firestation2
+
+        Arrays.fill(stationCoordinates, new StationLocation(-1,-1));
+        // System.out.println("====================================");
+
+        // for (int i = 0; i < stationCoordinates.length; i++) {
+        //     System.out.println(stationCoordinates[i].x + " " + stationCoordinates[i].y);
+        // }
+        // try {
+        //     Thread.sleep(5000);
+        // } catch (InterruptedException e) {
+        //     // TODO Auto-generated catch block
+        //     e.printStackTrace();
+        // }
 
         int x;
         int y;
@@ -49,9 +62,10 @@ public class Individual implements Comparable<Individual> {
             x = MyRand.nextInt(map.length);
             y = MyRand.nextInt(map[0].length);
 
-            while (!isValidCoordinate(x, y) && !notChosenYet(x, y, stationCoordinates)) {
+            while (!isValidCoordinate(x, y)) {
                 x = MyRand.nextInt(map.length);
                 y = MyRand.nextInt(map[0].length);
+                //System.out.println(x + " " + y);
             }
 
             StationLocation randomLocation = new StationLocation(x, y);
@@ -129,8 +143,9 @@ public class Individual implements Comparable<Individual> {
             int col = curr[1];
             int dist = curr[2];
 
-            if (!notChosenYet(row, col, fireStation)) { // kalo sampe firestation, return distancenya
-                return dist;
+            // Cek apakah sudah sampai di firestation? jika ya, return distance
+            if (!notChosenYet(row, col, fireStation)) {
+                return dist; // Stasiun terdekat
             }
 
             // Explore all four adjacent directions
@@ -150,7 +165,7 @@ public class Individual implements Comparable<Individual> {
             }
         }
 
-        // If no path to destination is found, return max value
+        // If no path to destination is found, return -1
         return -1;
     }
 
@@ -170,16 +185,15 @@ public class Individual implements Comparable<Individual> {
     }
 
     // single point crossover
-    // di sini hanya menghasilkan satu anak, crossover harusnya menghasilkan dua
-    // anak
-    // kemudian pilihannya bisa diambil anak terbaik saja, atau kedua anak masuk ke
-    // dalam populasi berikutnya
+    // di sini hanya menghasilkan satu anak, crossover harusnya menghasilkan dua anak
+    // kemudian pilihannya bisa diambil anak terbaik saja, atau kedua anak masuk ke dalam populasi berikutnya
     public Individual[] doCrossover(Individual other) {
-        Individual child1 = new Individual(this.MyRand, this.banyakFireStation, this.map);
-        Individual child2 = new Individual(this.MyRand, this.banyakFireStation, this.map);
+        Individual child1 = new Individual(this.MyRand, this.banyakFireStation);
+        Individual child2 = new Individual(this.MyRand, this.banyakFireStation);
 
         // Menentukan potongan untuk crossover
-        int potongan = this.MyRand.nextInt((int)(Math.ceil((banyakFireStation / 3)))) + (banyakFireStation / 3);
+        // int potongan = this.MyRand.nextInt((int) (Math.ceil((banyakFireStation / 3)))) + (banyakFireStation / 3);
+        int potongan = this.MyRand.nextInt(this.banyakFireStation);
 
         // random(17) + 7
         // 7 - 17+7
@@ -254,7 +268,7 @@ public class Individual implements Comparable<Individual> {
     @Override
     public String toString() {
         String res = "Individual Fitness: " + this.fitness + "\n";
-        for(int i = 0; i < chromosome.length; i++){
+        for (int i = 0; i < chromosome.length; i++) {
             res += chromosome[i].toString();
         }
 

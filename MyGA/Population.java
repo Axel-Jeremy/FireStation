@@ -7,14 +7,14 @@ public class Population {
     private int maxPopulationSize;
     private int populationSize = 0;
     public double elitismPct;
-    //ArrayList<Item> listOfItems;
+    // ArrayList<Item> listOfItems;
     int maxCapacity;
     int sumRank = 0;
     Random MyRand;
     public int banyakFireStation; // banyak firestation yang di deklarasi
     static int[][] map;
 
-    public Population(Random MyRand, /*ArrayList<Item> listOfItems,*/ int maxCapacity, int maxPopulationSize,
+    public Population(Random MyRand, /* ArrayList<Item> listOfItems, */ int maxCapacity, int maxPopulationSize,
             double elitismPct) {
         // skala 0-1
         this.MyRand = MyRand; // menggunakan random generator dari luar
@@ -23,14 +23,15 @@ public class Population {
         this.elitismPct = elitismPct;
         // this.listOfItems = listOfItems;
         this.maxCapacity = maxCapacity;
+        this.banyakFireStation = maxCapacity;
+
         for (int i = 1; i <= this.maxPopulationSize; i++)
             this.sumRank = this.sumRank + i;
-
     }
 
     public void randomPopulation() {
         for (int i = 0; i < this.maxPopulationSize; i++) {
-            this.addIndividual(new Individual(this.MyRand, this.banyakFireStation, this.map));
+            this.addIndividual(new Individual(this.MyRand, this.banyakFireStation));
         }
     }
 
@@ -44,8 +45,12 @@ public class Population {
 
     public void computeAllFitnesses() { // hitung fitness seluruh individu dalam populasi kemudian urutkan
         for (Individual individu : population) {
-            individu.setFitness(individu.chromosome);
+            // panggil setFitness jika belum dihitung
+            if (individu.fitness == Integer.MAX_VALUE) {
+                individu.setFitness(individu.chromosome);
+            }
         }
+        // Urutkan populasi berdasarkan fitness terkecil
         Collections.sort(this.population);
     }
 
@@ -53,12 +58,13 @@ public class Population {
     public Population getNewPopulationWElit() {
         // Panggil konstarktor population baru
         Population newPop = new Population(this.MyRand, this.maxCapacity, this.populationSize, this.elitismPct);
+
         int n = (int) (this.elitismPct * this.maxPopulationSize);
-        
+
         // System.out.println(n);
         // System.out.println(this.population.size());
 
-        // Ambil yang terbaik
+        // Ambil n terbaik
         for (int i = 0; i < n; i++) {
             // System.out.println(i);
             // boolean res = newPop.addIndividual(this.population.get(i));
@@ -95,11 +101,12 @@ public class Population {
      */
 
     // pemilihan 2 parent dengan teknik roulette wheel
-    public Individual[] selectParent() { 
+    public Individual[] selectParent() {
         Individual[] parents = new Individual[2];
-        // this.population.sort((idv1,idv2) -> idv1.compareTo(idv2));
 
-        int top = this.population.size() + 1;
+        // this.population.sort((idv1,idv2) -> idv1.compareTo(idv2));
+        //int top = this.population.size() + 1;
+
         long sumfitness = 0;
         for (int i = 0; i < this.population.size(); i++) {
             sumfitness = sumfitness + this.population.get(i).fitness;

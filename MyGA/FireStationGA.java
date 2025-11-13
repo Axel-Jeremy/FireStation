@@ -25,6 +25,7 @@ public class FireStationGA {
         int generation = 1;
         // buat populasi awal
         Population currentPop = new Population(MyRand, this.maxCapacity, this.maxPopulationSize, this.elitismPct);
+        System.out.println("ABCD");
         currentPop.randomPopulation(); // populasi diisi individu random
         currentPop.computeAllFitnesses(); // hitung seluruh fitnessnya
 
@@ -37,19 +38,19 @@ public class FireStationGA {
                 Individual[] parents = currentPop.selectParent(); // pilih parent
                 if (this.MyRand.nextDouble() < this.crossoverRate) { // apakah terjadi kawin silang?
                     Individual[] child = parents[0].doCrossover(parents[1]); // jika ya, crossover kedua parent untuk
-                                                                           // mendapatkan satu anak
-                    for(int i = 0; i < child.length; i++){
+                                                                             // mendapatkan satu anak
+                    for (int i = 0; i < child.length; i++) {
                         if (this.MyRand.nextDouble() < this.mutationRate) { // apakah terjadi mutasi?
                             child[i].doMutation();
                         }
                     }
 
-                    for(int i = 0; i < child.length; i++){
+                    for (int i = 0; i < child.length; i++) {
                         if (this.MyRand.nextDouble() < this.mutationRate) { // apakah terjadi mutasi?
                             newPop.addIndividual(child[i]); // masukkan anak ke dalam populasi
                         }
                     }
-                    
+
                 }
             }
             generation++; // sudah ada generasi baru
