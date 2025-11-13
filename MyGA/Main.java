@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -45,7 +46,8 @@ public class Main{
     		long seed = init.nextLong()%1000; 		//simpan seed sebagai seed untuk random generator
 			//System.out.println("Seed: "+seed);
 			Random gen = new Random(seed);	//random generator untuk algogen-nya
-	    	int maxCapacity=0, totalGeneration=0, maxPopulationSize=0;
+			// System.out.println("PPPP" + p);
+	    	int maxCapacity=p, totalGeneration=0, maxPopulationSize=0;
 	    	double crossoverRate=0.0, mutationRate=0.0, elitismPct=0.0;
 	    	//ArrayList<Item> listOfItems = new ArrayList<Item>();
 	    	// try {	//baca data item knapsack
@@ -56,7 +58,7 @@ public class Main{
 	        // 	}
 	        // } catch (FileNotFoundException e) { e.printStackTrace();}
 	        try {	//baca data parameter genetik
-	        	sc = new Scanner("param.txt");
+	        	sc = new Scanner(new File("param.txt"));
 	        	totalGeneration = sc.nextInt();
 	        	maxPopulationSize = sc.nextInt();
 	        	crossoverRate = sc.nextDouble();	//skala 0-1
@@ -66,16 +68,20 @@ public class Main{
 			//gen (random generator) dikirim ke algogen, jadi hanya menggunakan satu generator untuk keseluruhan algo
 		    FireStationGA ga = new FireStationGA(gen,totalGeneration,maxPopulationSize,elitismPct, crossoverRate,
 	                                        mutationRate, maxCapacity);
+			Individual.setMap(map);
+			Individual.setBanyakFirestation(p);
 	        Individual res = ga.run();	//ambil yg terbaik
 
 			//???
-			double fit = (1.0*res.fitness)/13692887; //kebetulan optimalnya tahu, tapi intinya untuk mencari tahu seberapa bagus fitnesnya
-			total = total + fit;
-	        System.out.printf("%2d: Acc = %.3f (%d) Seed: %d\n",ct,(1.0*res.fitness)/13692887,res.fitness,seed);
+			// double fit = (1.0*res.fitness)/13692887; //kebetulan optimalnya tahu, tapi intinya untuk mencari tahu seberapa bagus fitnesnya
+			// total = total + fit;
+	        // System.out.printf("%2d: Acc = %.3f (%d) Seed: %d\n",ct,(1.0*res.fitness)/13692887,res.fitness,seed);
 	        //for (int i=0;i<Integer.SIZE;i++) {
 	        //    int bit = res.chromosome&(1<<i);
 	        //    System.out.println(i+" :"+((bit>0)?"1":"0"));
 			//}
+			System.out.println("current: " + res.fitness);
+			total += res.fitness;
 		}
 		System.out.printf("Avg. fitness %.3f\n",total/loop);
 	}

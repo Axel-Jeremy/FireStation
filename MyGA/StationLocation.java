@@ -1,6 +1,6 @@
 public class StationLocation {
-    public int x;
-    public int y;
+    private int x;
+    private int y;
 
     public StationLocation(int x, int y){
         this.x = x;

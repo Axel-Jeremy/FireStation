@@ -37,19 +37,20 @@ public class FireStationGA {
                 Individual[] parents = currentPop.selectParent(); // pilih parent
                 if (this.MyRand.nextDouble() < this.crossoverRate) { // apakah terjadi kawin silang?
                     Individual[] child = parents[0].doCrossover(parents[1]); // jika ya, crossover kedua parent untuk
-                                                                           // mendapatkan satu anak
-                    for(int i = 0; i < child.length; i++){
+                                                                             // mendapatkan satu anak
+                    for (int i = 0; i < child.length; i++) {
                         if (this.MyRand.nextDouble() < this.mutationRate) { // apakah terjadi mutasi?
                             child[i].doMutation();
+                            // newPop.addIndividual(child[i]);
+                            // System.out.println(this.mutationRate);
                         }
+                        // System.out.println(i);
                     }
-
-                    for(int i = 0; i < child.length; i++){
-                        if (this.MyRand.nextDouble() < this.mutationRate) { // apakah terjadi mutasi?
-                            newPop.addIndividual(child[i]); // masukkan anak ke dalam populasi
-                        }
+                    for (int i = 0; i < child.length; i++) {
+                        // if (this.MyRand.nextDouble() < this.mutationRate) { // apakah terjadi mutasi?
+                        newPop.addIndividual(child[i]); // masukkan anak ke dalam populasi
+                        // }
                     }
-                    
                 }
             }
             generation++; // sudah ada generasi baru

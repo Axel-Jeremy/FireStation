@@ -21,7 +21,7 @@ public class Population {
         this.maxPopulationSize = maxPopulationSize;
         this.population = new ArrayList<Individual>();
         this.elitismPct = elitismPct;
-        // this.listOfItems = listOfItems;
+        // this.banyakFireStation = maxCapacity;
         this.maxCapacity = maxCapacity;
         for (int i = 1; i <= this.maxPopulationSize; i++)
             this.sumRank = this.sumRank + i;
@@ -30,7 +30,7 @@ public class Population {
 
     public void randomPopulation() {
         for (int i = 0; i < this.maxPopulationSize; i++) {
-            this.addIndividual(new Individual(this.MyRand, this.banyakFireStation, this.map));
+            this.addIndividual(new Individual(this.MyRand));
         }
     }
 
@@ -99,7 +99,7 @@ public class Population {
         Individual[] parents = new Individual[2];
         // this.population.sort((idv1,idv2) -> idv1.compareTo(idv2));
 
-        int top = this.population.size() + 1;
+        //int top = this.population.size() + 1;
         long sumfitness = 0;
         for (int i = 0; i < this.population.size(); i++) {
             sumfitness = sumfitness + this.population.get(i).fitness;
