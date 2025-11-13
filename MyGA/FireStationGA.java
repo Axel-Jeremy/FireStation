@@ -25,6 +25,7 @@ public class FireStationGA {
         int generation = 1;
         // buat populasi awal
         Population currentPop = new Population(MyRand, this.maxCapacity, this.maxPopulationSize, this.elitismPct);
+        System.out.println("ABCD");
         currentPop.randomPopulation(); // populasi diisi individu random
         currentPop.computeAllFitnesses(); // hitung seluruh fitnessnya
 
