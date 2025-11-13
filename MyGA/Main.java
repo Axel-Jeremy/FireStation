@@ -84,6 +84,7 @@ public class Main{
 			total += res.fitness;
 		}
 		System.out.printf("Avg. fitness %.3f\n",total/loop);
+		
 	}
 }
 
