@@ -1,345 +1,402 @@
 import java.util.*;
 
 public class MySA {
-	static final Random rnd = new Random();
-	// private int[][] firestationCoordinates;
-	static int[][] map;
-	static int banyakFireStation;
-	static int banyakRumah;
-	// Direction vectors
-	static int dRow[] = { -1, 0, 1, 0 };
-	static int dCol[] = { 0, 1, 0, -1 };
+    static Random rnd;
 
-	// objective function (maximizing)
-	// itung jarak terdekat (shortest path) dari setiap rumah ke firestation
-	// terdekat, tambahin
-	static double f(int[][] fireStation) {
-		int totalCost = 0;
+    // peta input, berisi posisi rumah dan pohon
+    static int[][] map; // 0: jalan kosong, 1: rumah, 2: pohon
 
-		for (int i = 0; i < map.length; i++) {
-			for (int j = 0; j < map[i].length; j++) {
-				if (map[i][j] == 1) {
-					// do bfs
-					int cost = shortestPath(i, j, fireStation);
-					if (cost == -1)
-						return Integer.MAX_VALUE;
-						
-					totalCost += cost;
-				}
-			}
-		}
-		return totalCost;
-	}
+    static int banyakFireStation; // banyak firestation dari input (p)
+    static int banyakRumah; // banyak rumah dari input (h)
+    static List<Coordinate> houseLocations = new ArrayList<>();
+    // Direction vectors, untuk bfs
+    static int dRow[] = { -1, 0, 1, 0 };
+    static int dCol[] = { 0, 1, 0, -1 };
 
-	// Function to check if the given cell is within bounds,
-	// and not already visited
-	static boolean isValid(int row, int col, boolean[][] visited) {
-		return row >= 0 && row < map.length &&
-				col >= 0 && col < map[0].length &&
-				!visited[row][col] &&
-				map[row][col] == 0; /// 0 = kosong
-	}
+    public MySA(long seed, List<Coordinate> houseLocations, int banyakFireStation, int banyakRumah, int[][] map) {
+        rnd = new Random(seed);
+        this.houseLocations = houseLocations;
+        this.banyakFireStation = banyakFireStation;
+        this.banyakRumah = banyakRumah;
+        this.map = map;
+    }
 
-	// BFS function to find the shortest distance
-	// from 's' to 'd' in the matrix
-	static int shortestPath(int xRow, int yCol, int[][] fireStation) {
-		int n = map.length;
-		int m = map[0].length;
+    // objective function (minimizing)
+    // itung jarak terdekat (shortest path) dari setiap firestation ke rumah
+    public double f(StationLocation[] fireStation) {
+        int m = map.length;
+        int n = map[0].length;
 
-		// Direction vectors for moving: up, down, left, right
-		int[] dRow = { -1, 1, 0, 0 };
-		int[] dCol = { 0, 0, -1, 1 };
+        // Peta jarak, diisi dengan tak hingga
+        int[][] dist = new int[m][n];
+        for (int[] row : dist) {
+            Arrays.fill(row, Integer.MAX_VALUE);
+        }
 
-		// Visited matrix to keep track of explored cells
-		boolean[][] visited = new boolean[map.length][map[0].length];
+        // Queue Multi-Source BFS
+        Queue<Coordinate> q = new LinkedList<>();
 
-		// Queue to perform BFS: stores {row, col, distance}
-		Queue<int[]> q = new LinkedList<>();
+        // Tambahkan semua stasiun sebagai sumber
+        for (StationLocation station : fireStation) {
+            int r = station.getX();
+            int c = station.getY();
 
-		q.offer(new int[] { xRow, yCol, 0 });
-		visited[xRow][yCol] = true;
+            // Pastikan stasiun valid (dalam peta dan bukan di pohon)
+            // Stasiun bisa di jalan (0) atau di rumah (1)
+            if (isValid(r, c)) {
+                if (dist[r][c] == Integer.MAX_VALUE) { // Hindari duplikat jika 2 stasiun di 1 titik
+                    dist[r][c] = 0;
+                    q.offer(new Coordinate(r, c, 0));
+                }
+            }
+        }
 
-		// Standard BFS loop
-		while (!q.isEmpty()) {
+        // BFS (hanya di jalan, sel '0')
+        while (!q.isEmpty()) {
+            Coordinate curr = q.poll();
+            int r = curr.getX();
+            int c = curr.getY();
+            int d = curr.getDistance();
 
-			int[] curr = q.poll();
+            for (int i = 0; i < 4; i++) {
+                int newRow = r + dRow[i];
+                int newCol = c + dCol[i];
 
-			int row = curr[0];
-			int col = curr[1];
-			int dist = curr[2];
+                // Cek di map, cuma jalan (0), dan belum dikunjungi (dist masih MAX)
+                if (isValid(newRow, newCol)
+                        && dist[newRow][newCol] == Integer.MAX_VALUE) {
+                    dist[newRow][newCol] = d + 1;
+                    q.offer(new Coordinate(newRow, newCol, d + 1));
+                }
+            }
+        }
 
-			if (!notChosenYet(row, col, fireStation)) { // kalo sampe firestation, return distancenya
-				return dist;
-			}
+        // itung total biaya dari rumah yang sudah disimpan
+        int totalCost = 0;
+        for (Coordinate house : houseLocations) {
+            int r = house.getX();
+            int c = house.getY();
 
-			// Explore all four adjacent directions
-			for (int i = 0; i < 4; i++) {
-				int newRow = row + dRow[i];
-				int newCol = col + dCol[i];
+            // Ambil jarak langsung ke sel rumah,
+            // karena BFS kita sekarang bisa berjalan di atas rumah (1)
+            int costToThisHouse = dist[r][c];
 
-				// If new cell is valid and can be visited
-				if (isValid(newRow, newCol, visited)) {
+            // Cek jika rumah ini benar-benar terisolasi (dikelilingi pohon)
+            if (costToThisHouse == Integer.MAX_VALUE) {
+                return Integer.MAX_VALUE; // State tidak valid, beri penalti tertinggi
+            }
 
-					// Mark the new cell as visited
-					visited[newRow][newCol] = true;
+            // Jika stasiun di atas rumah, costToThisHouse == 0
+            // Jika stasiun 5 langkah, costToThisHouse == 5
+            // Tidak perlu +1, karena jaraknya sudah dihitung ke sel rumah
+            totalCost += costToThisHouse;
+        }
 
-					// Push the new cell with updated distance
-					q.offer(new int[] { newRow, newCol, dist + 1 });
-				}
-			}
-		}
+        return totalCost;
+    }
 
-		// If no path to destination is found, return max value
-		return -1;
-	}
+    // Function cek masih dalam batas length dan (row,col) adalah jalan kosong
+    private boolean isValid(int row, int col) {
+        return row >= 0 && row < map.length
+                && col >= 0 && col < map[0].length
+                && map[row][col] != 2;
+    }
 
-	// alternatif mencari neighbor state di antara [-stepSize, stepSize]
-	static int[][] getNeighbor(int x, int y, double stepSize) {
-		int[][] neighborCoordinates = new int[4][2];
+    static StationLocation[] deepCopy(StationLocation[] original) {
+        StationLocation[] copy = new StationLocation[original.length];
+        for (int i = 0; i < original.length; i++) {
+            copy[i] = new StationLocation(original[i].getX(), original[i].getY());
+        }
+        return copy;
+    }
+    
 
-		for (int i = 0; i < neighborCoordinates.length; i++) {
-			Arrays.fill(neighborCoordinates[i], -1);
-		}
+    // Mencari neighbor state di antara [-stepSize, stepSize]
+    private StationLocation[] getNeighbor(int x, int y, double stepSize) {
+        StationLocation[] neighborCoordinates = new StationLocation[4]; // array neighbor state, 4 karena neighbor hanya
+                                                                        // bisa atas bawah
+        // kiri kanan
+        for (int i = 0; i < neighborCoordinates.length; i++)
+            neighborCoordinates[i] = new StationLocation(-1, -1);
 
-		for (int i = 0; i < 4; i++) {
-			int stepX = (int) (dRow[i] * stepSize);
-			int stepY = (int) (dCol[i] * stepSize);
+        for (int i = 0; i < 4; i++) {
+            int stepX = (int) (dRow[i] * stepSize);
+            int stepY = (int) (dCol[i] * stepSize);
 
-			if (stepX + x < map.length && stepY + y < map[0].length) {
-				neighborCoordinates[i][0] = x + (int) (dRow[i] * stepSize);
-				neighborCoordinates[i][1] = y + (int) (dCol[i] * stepSize);
-			}
-		}
-		return neighborCoordinates;
-	}
+            if (stepX + x < map.length && stepY + y < map[0].length) { // cek kalo x dan y sekarang kalo ditambah step
+                                                                       // masih dalam jangkauan
+                neighborCoordinates[i].setX(x + (int) (dRow[i] * stepSize));
+                neighborCoordinates[i].setY(y + (int) (dCol[i] * stepSize));
+            }
+        }
+        return neighborCoordinates; // return neighbor states atas bawah kiri kanan
+    }
 
-	// generate random coordinate buat koordinat si firestation
-	static int[][] generateRandomCoordinates() {
-		int[][] stationCoordinates = new int[banyakFireStation][2];
-		for (int i = 0; i < stationCoordinates.length; i++) {
-			Arrays.fill(stationCoordinates[i], -1);
-		}
-		int x, y;
+    // generate random koordinat firestation
+    public static StationLocation[] generateRandomCoordinates() {
+        // array buat simpen koordinat random sebanyak n firestation
+        StationLocation[] stationCoordinates = new StationLocation[banyakFireStation];
 
-		for (int i = 0; i < banyakFireStation; i++) {
-			x = rnd.nextInt(map.length);
-			y = rnd.nextInt(map[0].length);
+        for (int i = 0; i < stationCoordinates.length; i++)
+            stationCoordinates[i] = new StationLocation(-1, -1);
 
-			while (!isValidCoordinate(x, y) && !notChosenYet(x, y, stationCoordinates)) {
-				x = rnd.nextInt(map.length);
-				y = rnd.nextInt(map[0].length);
-			}
-			stationCoordinates[i][0] = x;
-			stationCoordinates[i][1] = y;
-		}
-		return stationCoordinates;
-	}
+        // contoh struktur array stationCoordinates yang dibuat
+        // [x1][y1] - coord firestation1
+        // [x2][y2] - coord firestation2
 
-	static boolean isValidCoordinate(int x, int y) {
-		if (map[x][y] == 0)
-			return true;
-		return false;
-	}
+        int x;
+        int y;
+        for (int i = 0; i < banyakFireStation; i++) {
+            x = rnd.nextInt(map.length); // random x
+            y = rnd.nextInt(map[0].length); // random y
 
-	static boolean notChosenYet(int x, int y, int[][] neighborCoordinates) {
-		for (int i = 0; i < neighborCoordinates.length; i++) {
-			if (x == neighborCoordinates[i][0] && y == neighborCoordinates[i][1])
-				return false;
-		}
-		return true;
-	}
+            // cek valid & belum dipilih
+            while (!isValidCoordinate(x, y) && !notChosenYet(x, y, stationCoordinates)) { // selama belum valid dan
+                                                                                          // sudah dipilih, random
+                                                                                          // lagi
+                // terus random koordinat sampe nemu yang valid & belom dipilih
+                x = rnd.nextInt(map.length);
+                y = rnd.nextInt(map[0].length);
+            }
 
-	static boolean isNotOutOfBound(int[] arr) { // [x][y]
-		int x = arr[0];
-		int y = arr[1];
+            // simpen x dan y yang valid
+            stationCoordinates[i].setX(x);
+            stationCoordinates[i].setY(y);
+        }
+        return stationCoordinates; // return koordinat random firestation
+    }
 
-		// Cek tidak ada yg d batas negatif (atas), tidak lewatin batas bawah dan kanan serta kiri peta
-		return x >= 0 && x < map.length && y >= 0 && y < map[0].length;
-	}
+    private static boolean isValidCoordinate(int x, int y) { // cek x dan y
+        if (map[x][y] != 2) // kalo jalan kosong (bukan pohon/rumah)
+            return true; // valid
+        return false; // else, tidak valid
+    }
 
-	// // pastikan x ada diantara MAX_X dan MIN_X;
-	// static double clamp(double x) {
-	// x = Math.max(MIN_X, x);
-	// x = Math.min(x, MAX_X);
-	// return x;
-	// }
+    private static boolean notChosenYet(int x, int y, StationLocation[] neighborCoordinates) { // cek apakah x dan y
+                                                                                               // udah
+        // dipilih
+        for (int i = 0; i < neighborCoordinates.length; i++) {
+            if (x == neighborCoordinates[i].getX()
+                    && y == neighborCoordinates[i].getY())
+                return false;
+        }
+        return true; // x dan y belum dipilih
+    }
 
-	static int[][] simulatedAnnealing(double t0, double cooling, double stopping_temp, double stepSize) {
-		int[][] randPos = generateRandomCoordinates(); // posisi awal random
-		double currentF = f(randPos);
+    private boolean isNotOutOfBound(StationLocation station) { // [x][y] cek masih dalam jangkauan map
+        int x = station.getX();
+        int y = station.getY();
 
-		int[][] bestState = randPos;
-		int[][] currentState = randPos;
-		double bestF = currentF;
-		double T = t0; // schedule(t)
-		while (true) { // sampai lebih kecil dari stopping_temp atau bisa diiterasi juga
-			if (T < stopping_temp)
-				break;
-			// successor state: "perturbation" via gaussian (mean = 0, deviasi = stepSize)
-			// getneighbor
-			int randomIdx = rnd.nextInt(banyakFireStation); // dari banyak firestation, pilih 1 random
-			int[][] neighborStates = getNeighbor(randPos[randomIdx][0], randPos[randomIdx][1], stepSize);
-			// buat neighbor state-nya --> bisa gunakan getNeighbor()
-			int[][] topNeighborStates = null;
-			if (isNotOutOfBound(neighborStates[0])) {
-				topNeighborStates = randPos;
-				topNeighborStates[randomIdx][0] = neighborStates[0][0];
-				topNeighborStates[randomIdx][1] = neighborStates[0][1];
-			}
+        return x >= 0 && x < map.length && y >= 0 && y < map[0].length;
+    }
 
-			int[][] rightNeighborStates = null;
-			if (isNotOutOfBound(neighborStates[1])) {
-				rightNeighborStates = randPos;
-				rightNeighborStates[randomIdx][0] = neighborStates[1][0];
-				rightNeighborStates[randomIdx][1] = neighborStates[1][1];
-			}
+    // // pastikan x ada diantara MAX_X dan MIN_X;
+    // static double clamp(double x) {
+    // x = Math.max(MIN_X, x);
+    // x = Math.min(x, MAX_X);
+    // return x;
+    // }
 
-			int[][] bottomNeighborStates = null;
-			if (isNotOutOfBound(neighborStates[2])) {
-				bottomNeighborStates = randPos;
-				bottomNeighborStates[randomIdx][0] = neighborStates[2][0];
-				bottomNeighborStates[randomIdx][1] = neighborStates[2][1];
-			}
+    public StationLocation[] simulatedAnnealing(double t0, double cooling, double stopping_temp, double stepSize) {
+        StationLocation[] randPos = generateRandomCoordinates(); // posisi awal random
+        double currentF = f(randPos);
 
-			int[][] leftNeighborStates = null;
-			if (isNotOutOfBound(neighborStates[3])) {
-				leftNeighborStates = randPos;
-				leftNeighborStates[randomIdx][0] = neighborStates[3][0];
-				leftNeighborStates[randomIdx][1] = neighborStates[3][1];
-			}
+        StationLocation[] bestState = randPos;
+        StationLocation[] currentState = randPos;
+        double bestF = currentF;
 
-			// keluarkan firestation ketika terpojok
-			if (topNeighborStates == null && rightNeighborStates == null && bottomNeighborStates == null && leftNeighborStates == null){
-				T *= cooling;
-				continue;
-			}
+        double currentStepSize = stepSize;
 
-			int[][] successorFireStation = null;
-			int randomSuccessorIdx = rnd.nextInt(4);
+        double T = t0; // schedule(t)
+        while (true) { // sampai lebih kecil dari stopping_temp atau bisa diiterasi juga
+            if (T < stopping_temp)
+                break;
+            // successor state: "perturbation" via gaussian (mean = 0, deviasi = stepSize)
+            // getneighbor\
 
-			while (successorFireStation == null) {
-				randomSuccessorIdx = rnd.nextInt(4);
+            currentStepSize = stepSize * (T / t0);
+            if (currentStepSize < 1.0)
+                currentStepSize = 1.0; // jangan sampai 0
 
-				switch (randomSuccessorIdx) {
-					case 0:
-						successorFireStation = topNeighborStates;
-						break;
-					case 1:
-						successorFireStation = rightNeighborStates;
-						break;
-					case 2:
-						successorFireStation = bottomNeighborStates;
-						break;
-					case 3:
-						successorFireStation = leftNeighborStates;
-						break;
-				}
-			}
+            int randomIdx = rnd.nextInt(banyakFireStation); // dari banyak firestation, pilih 1 random
 
-			double successorF = f(successorFireStation); // hitung f()-nya
-			double deltaE = successorF - currentF; // hitung delta
-			// karena cari minimal total cost jadi deltaE < 0
-			if ((deltaE < 0) || (rnd.nextDouble() <= Math.exp(deltaE / T))) { // kriteria acceptance
-				currentState = successorFireStation; // pindah karena lebih baik
-				currentF = successorF;
-				// update current state dan f(current) jadi lebih kecil
-				if (currentF < bestF) { // simpan terbaik
-					bestF = currentF;
-					bestState = currentState;
-				}
-			}
-			T *= cooling; // turunkan suhu
-		}
-		// return currentX;
-		return bestState;
-	}
+            StationLocation[] neighborStates = getNeighbor(currentState[randomIdx].getX(),
+                    currentState[randomIdx].getY(),
+                    currentStepSize);
 
-	// run: SA 100 0.999 0.0001 0.1
-	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
+            // buat neighbor state-nya
+            StationLocation[] topNeighborStates = null;
+            double topF = Integer.MAX_VALUE;
+            if (isNotOutOfBound(neighborStates[0])
+                    && isValidCoordinate(neighborStates[0].getX(), neighborStates[0].getY())) {
+                topNeighborStates = deepCopy(currentState); // GUNAKAN DEEP COPY
+                topNeighborStates[randomIdx].setX(neighborStates[0].getX());
+                topNeighborStates[randomIdx].setY(neighborStates[0].getY());
+                topF = f(topNeighborStates);
+            }
 
-		// ukuran peta
-		int n = sc.nextInt();
-		int m = sc.nextInt();
+            StationLocation[] rightNeighborStates = null;
+            double rightF = Integer.MAX_VALUE;
+            if (isNotOutOfBound(neighborStates[1])
+                    && isValidCoordinate(neighborStates[1].getX(), neighborStates[1].getY())) {
+                rightNeighborStates = deepCopy(currentState); // GUNAKAN DEEP COPY
+                rightNeighborStates[randomIdx].setX(neighborStates[1].getX());
+                rightNeighborStates[randomIdx].setY(neighborStates[1].getY());
+                rightF = f(rightNeighborStates);
+            }
 
-		map = new int[m][n];
-		boolean[][] visited = new boolean[m][n];
+            StationLocation[] bottomNeighborStates = null;
+            double bottomF = Integer.MAX_VALUE;
+            if (isNotOutOfBound(neighborStates[2])
+                    && isValidCoordinate(neighborStates[2].getX(), neighborStates[2].getY())) {
+                bottomNeighborStates = deepCopy(currentState); // GUNAKAN DEEP COPY
+                bottomNeighborStates[randomIdx].setX(neighborStates[2].getX());
+                bottomNeighborStates[randomIdx].setY(neighborStates[2].getY());
+                bottomF = f(bottomNeighborStates);
+            }
 
-		// banyak fire station
-		int p = sc.nextInt();
+            StationLocation[] leftNeighborStates = null;
+            double leftF = Integer.MAX_VALUE;
+            if (isNotOutOfBound(neighborStates[3])
+                    && isValidCoordinate(neighborStates[3].getX(), neighborStates[3].getY())) {
+                leftNeighborStates = deepCopy(currentState); // GUNAKAN DEEP COPY
+                leftNeighborStates[randomIdx].setX(neighborStates[3].getX());
+                leftNeighborStates[randomIdx].setY(neighborStates[3].getY());
+                leftF = f(leftNeighborStates);
+            }
 
-		// banyak rumah
-		int h = sc.nextInt();
+            // keluarkan firestation ketika terpojok
+            if (topNeighborStates == null && rightNeighborStates == null && bottomNeighborStates == null
+                    && leftNeighborStates == null) {
+                T *= cooling;
+                continue;
+            }
 
-		// banyak pohon
-		int t = sc.nextInt();
+            StationLocation[] successorFireStation = null;
+            int randomSuccessorIdx = rnd.nextInt(4);
 
-		// input koordinat rumah
-		for (int i = 0; i < h; i++) {
-			int x = sc.nextInt();
-			int y = sc.nextInt();
-			map[m - y][x - 1] = 1;
-		}
+            while (successorFireStation == null) {
+                randomSuccessorIdx = rnd.nextInt(4);
 
-		// input koordinat pohon
-		for (int i = 0; i < t; i++) {
-			int x = sc.nextInt();
-			int y = sc.nextInt();
-			map[m - y][x - 1] = 2;
-		}
-		sc.close();
+                switch (randomSuccessorIdx) {
+                    case 0:
+                        successorFireStation = topNeighborStates;
+                        break;
+                    case 1:
+                        successorFireStation = rightNeighborStates;
+                        break;
+                    case 2:
+                        successorFireStation = bottomNeighborStates;
+                        break;
+                    case 3:
+                        successorFireStation = leftNeighborStates;
+                        break;
+                }
+            }
 
-		banyakFireStation = p;
-		banyakRumah = h;
+            double successorF = f(successorFireStation); // hitung f()-nya
+            double deltaE = successorF - currentF; // hitung delta
+            // karena cari minimal total cost jadi deltaE < 0
+            if ((deltaE < 0) || (rnd.nextDouble() <= Math.exp(-deltaE / T))) { // kriteria acceptance
+                currentState = successorFireStation; // pindah karena lebih baik
+                currentF = successorF;
+                // update current state dan f(current) jadi lebih kecil
+                if (currentF < bestF) { // simpan terbaik
+                    bestF = currentF;
+                    bestState = currentState;
+                }
+            }
+            T *= cooling; // turunkan suhu
+        }
+        // return currentX;
+        return bestState;
+    }
 
-		double starting_temp = Double.parseDouble(args[0]);
-		double cooling_rate = Double.parseDouble(args[1]);
-		double stopping_temp = Double.parseDouble(args[2]);
-		double stepSize = Double.parseDouble(args[3]);
-		int runs = Integer.parseInt(args[4]);
-		int i = 1;
+    // run: SA 100 0.999 0.0001 0.1
+    // public static void main(String[] args) {
+    // Scanner sc = new Scanner(System.in);
 
-		int[][] bestState = generateRandomCoordinates();
-		double bestF = f(bestState);
-		while (i++ <= runs) { // lakukan sebanyak runs kali
-			System.out.printf("Run %d\n", i - 1);
-			// hasil SA terbaik
-			int[][] currentState = simulatedAnnealing(starting_temp, cooling_rate, stopping_temp, stepSize);
-			double currentF = f(currentState); // hitung f(x) dari hasil SA
-			System.out.printf("Simulated Annealing result:\n");
-			System.out.printf("Current f = %.5f\n", ((1.0 * currentF) / (1.0 * banyakRumah)));
+    // // ukuran peta
+    // int n = sc.nextInt();
+    // int m = sc.nextInt();
 
-			System.out.println("Current fire station coordinates (x, y):");
-			for (int k = 0; k < currentState.length; k++) {
-				System.out.print("(");
-				for (int j = 0; j < currentState[k].length; j++) {
-					System.out.print(currentState[k][j] + "");
-				}
-				System.out.println(")");
-			}
-			System.out.println("----------------------------------------------------------");
+    // map = new int[m][n];
+    // boolean[][] visited = new boolean[m][n];
 
-			if (currentF < bestF) { // simpan f(x) terbaik;
-				bestF = currentF;
-				bestState = currentState;
-			}
-		}
+    // // banyak fire station
+    // int p = sc.nextInt();
 
-		System.out.printf("Simulated Annealing BEST:\n");
-		System.out.printf("Best f = %.5f\n", ((1.0 * bestF) / (1.0 * banyakRumah)));
+    // // banyak rumah
+    // int h = sc.nextInt();
 
-		System.out.println("Best fire station coordinates (x, y):");
-		for (int k = 0; k < bestState.length; k++) {
-			System.out.print("(");
-			for (int j = 0; j < bestState[k].length; j++) {
-				System.out.print(bestState[k][j] + "");
-			}
-			System.out.println(")");
-		}
-		System.out.println("----------------------------------------------------------");
-	}
+    // // banyak pohon
+    // int t = sc.nextInt();
+
+    // // input koordinat rumah
+    // for (int i = 0; i < h; i++) {
+    // int x = sc.nextInt();
+    // int y = sc.nextInt();
+    // map[m - y][x - 1] = 1;
+    // }
+
+    // // input koordinat pohon
+    // for (int i = 0; i < t; i++) {
+    // int x = sc.nextInt();
+    // int y = sc.nextInt();
+    // map[m - y][x - 1] = 2;
+    // }
+    // sc.close();
+
+    // banyakFireStation = p;
+    // banyakRumah = h;
+
+    // double starting_temp = Double.parseDouble(args[0]);
+    // double cooling_rate = Double.parseDouble(args[1]);
+    // double stopping_temp = Double.parseDouble(args[2]);
+    // double stepSize = Double.parseDouble(args[3]);
+    // int runs = Integer.parseInt(args[4]);
+    // int i = 1;
+
+    // StationLocation[] bestState = generateRandomCoordinates();
+    // double bestF = f(bestState);
+
+    // while (i++ <= runs) { // lakukan sebanyak runs kali
+    // System.out.printf("Run %d\n", i - 1);
+    // // hasil SA terbaik
+    // StationLocation[] currentState = simulatedAnnealing(starting_temp,
+    // cooling_rate, stopping_temp, stepSize);
+    // double currentF = f(currentState); // hitung f(x) dari hasil SA
+    // System.out.printf("Simulated Annealing result:\n");
+    // System.out.printf("Current f = %.5f\n", ((1.0 * currentF) / (1.0 *
+    // banyakRumah)));
+
+    // System.out.println("Current fire station coordinates (x, y):");
+    // for (int k = 0; k < currentState.length; k++) {
+    // System.out.print("(");
+    // for (int j = 0; j < currentState[k].length; j++) {
+    // System.out.print(currentState[k][j] + "");
+    // }
+    // System.out.println(")");
+    // }
+    // System.out.println("----------------------------------------------------------");
+
+    // if (currentF < bestF) { // simpan f(x) terbaik;
+    // bestF = currentF;
+    // bestState = currentState;
+    // }
+    // }
+
+    // System.out.printf("Simulated Annealing BEST:\n");
+    // System.out.printf("Best f = %.5f\n", ((1.0 * bestF) / (1.0 * banyakRumah)));
+
+    // System.out.println("Best fire station coordinates (x, y):");
+    // for (int k = 0; k < bestState.length; k++) {
+    // System.out.print("(");
+    // for (int j = 0; j < bestState[k].length; j++) {
+    // System.out.print(bestState[k][j] + "");
+    // }
+    // System.out.println(")");
+    // }
+    // System.out.println("----------------------------------------------------------");
+    // }
 }
-
-// Yg davin ubah tadi di bagian:
-// 1. If isNotOutOfBound() jadi (deltaE < 0) sblmnya (deltaE > 0)
-// 2. ngebalikin yg if topNeighborStates == null dkk nya

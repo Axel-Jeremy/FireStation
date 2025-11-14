@@ -1,5 +1,6 @@
 import java.util.Random;
 import java.util.ArrayList;
+import java.util.List;
 
 public class FireStationGA {
     Random MyRand;
@@ -9,6 +10,7 @@ public class FireStationGA {
     public double mutationRate;
     public int totalGeneration;
     int maxCapacity;
+
 
     public FireStationGA(Random MyRand, int totalGeneration, int maxPopulationSize, double elitismPct,
             double crossoverRate, double mutationRate, int maxCapacity) {

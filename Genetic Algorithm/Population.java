@@ -1,5 +1,3 @@
-import java.util.Random;
-import java.util.ArrayList;
 import java.util.*;
 
 public class Population {
@@ -14,7 +12,7 @@ public class Population {
     public int banyakFireStation; // banyak firestation yang di deklarasi
     static int[][] map;
 
-    public Population(Random MyRand, /*ArrayList<Item> listOfItems,*/ int maxCapacity, int maxPopulationSize,
+    public Population(Random MyRand, int maxCapacity, int maxPopulationSize,
             double elitismPct) {
         // skala 0-1
         this.MyRand = MyRand; // menggunakan random generator dari luar
@@ -106,7 +104,7 @@ public class Population {
         }
         // System.out.println(sumfitness);
         for (int i = 0; i < this.population.size(); i++) {
-            ((Individual) this.population.get(i)).parentProbability = (1.0 * this.population.get(i).fitness) / sumfitness;
+            ((Individual) this.population.get(i)).parentProbability = 1 -((1.0 * this.population.get(i).fitness) / sumfitness);
         }
 
         // Kode untuk roulette
