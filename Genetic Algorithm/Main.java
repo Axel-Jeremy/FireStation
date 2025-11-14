@@ -2,51 +2,70 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.List;
+import java.io.FileNotFoundException;
 
 public class Main{
 	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
+		Scanner sc;
+        // Ukuran Peta n*m
+        int n = 0;
+        int m = 0;
 
-        // ukuran peta
-        int n = sc.nextInt();
-        int m = sc.nextInt();
+        int p = 0; // Banyak Fire Station
+        int h = 0; // Banyak Rumah
+        int t = 0; // Banyak pohon
+        int[][] map = null;
+        List<Coordinate> houseLocations = new ArrayList<>();
 
-        int[][] map = new int[m][n];
-        boolean[][] visited = new boolean[m][n];
+        try {
+            // input dari file input.txt
+            sc = new Scanner(new File("input_large.txt"));
 
-        // banyak fire station
-        int p = sc.nextInt();
+            // ukuran peta
+            n = sc.nextInt();
+            m = sc.nextInt();
+            map = new int[m][n];
 
-        // banyak rumah
-        int h = sc.nextInt();
+            // banyak fire station
+            p = sc.nextInt();
 
-        // banyak pohon
-        int t = sc.nextInt();
+            // banyak rumah
+            h = sc.nextInt();
 
-        // input koordinat rumah
-        for (int i = 0; i < h; i++) {
-            int x = sc.nextInt();
-            int y = sc.nextInt();
-            map[m - y][x - 1] = 1;
+            // banyak pohon
+            t = sc.nextInt();
+
+            // input koordinat rumah
+            for (int i = 0; i < h; i++) {
+                int x = sc.nextInt();
+                int y = sc.nextInt();
+                map[m - y][x - 1] = 1;
+                houseLocations.add(new Coordinate(m - y, x - 1));
+            }
+
+            // input koordinat pohon
+            for (int i = 0; i < t; i++) {
+                int x = sc.nextInt();
+                int y = sc.nextInt();
+                map[m - y][x - 1] = 2;
+            }
+            sc.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
-
-        // input koordinat pohon
-        for (int i = 0; i < t; i++) {
-            int x = sc.nextInt();
-            int y = sc.nextInt();
-            map[m - y][x - 1] = 2;
-        }
-        sc.close();
 
 		int loop = Integer.parseInt(args[0]);//berapa kali algogen dijalankan
 		double total = 0;
 		Random init = new Random(); 	//random generator untuk membuat seed
+		int bestFitness = Integer.MAX_VALUE;
+		Individual bestState = null;
     	for (int ct=1;ct<=loop;ct++) {
 			//System.out.println("===================\nRun: "+ct);
     		long seed = init.nextLong()%1000; 		//simpan seed sebagai seed untuk random generator
 			//System.out.println("Seed: "+seed);
 			Random gen = new Random(seed);	//random generator untuk algogen-nya
-			// System.out.println("PPPP" + p);
+
 	    	int maxCapacity=p, totalGeneration=0, maxPopulationSize=0;
 	    	double crossoverRate=0.0, mutationRate=0.0, elitismPct=0.0;
 	    	//ArrayList<Item> listOfItems = new ArrayList<Item>();
@@ -70,6 +89,7 @@ public class Main{
 	                                        mutationRate, maxCapacity);
 			Individual.setMap(map);
 			Individual.setBanyakFirestation(p);
+			Individual.setHouseLocation(houseLocations);
 	        Individual res = ga.run();	//ambil yg terbaik
 
 			//???
@@ -82,7 +102,13 @@ public class Main{
 			//}
 			System.out.println("current: " + res.fitness);
 			total += res.fitness;
+
+			if(bestFitness > res.fitness){
+				bestFitness = res.fitness;
+				bestState = res;
+			}
 		}
+		System.out.printf("Best fitness %d\n",bestFitness);
 		System.out.printf("Avg. fitness %.3f\n",total/loop);
 		
 	}

@@ -1,5 +1,7 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
@@ -12,6 +14,10 @@ public class Individual implements Comparable<Individual> {
     static int banyakFireStation; // banyak firestation yang di deklarasi
     static int[][] map;
 
+    private static final int[] dRow = { 0, 0, 1, -1 };
+    private static final int[] dCol = { 1, -1, 0, 0 };
+    public static List<Coordinate> houseLocations = new ArrayList<>();
+
     // membuat individu acak
     public Individual(Random MyRand) {
         this.MyRand = MyRand;
@@ -20,7 +26,7 @@ public class Individual implements Comparable<Individual> {
 
         // System.out.println("=================");
         // for(int i = 0; i < chromosome.length; i++){
-        //     System.out.println(chromosome[i]);
+        // System.out.println(chromosome[i]);
         // }
 
         this.fitness = setFitness(chromosome);
@@ -28,14 +34,18 @@ public class Individual implements Comparable<Individual> {
 
     }
 
-    //Method untuk Peta yang akan digunakan
-    public static void setMap(int[][] map){
+    // Method untuk Peta yang akan digunakan
+    public static void setMap(int[][] map) {
         Individual.map = map;
     }
 
-    //Method untuk p yang akan digunakan
-    public static void setBanyakFirestation(int banyakFireStation){
+    // Method untuk p yang akan digunakan
+    public static void setBanyakFirestation(int banyakFireStation) {
         Individual.banyakFireStation = banyakFireStation;
+    }
+
+    public static void setHouseLocation(List<Coordinate> houseLocations){
+        Individual.houseLocations = houseLocations;
     }
 
     // membuat individu baru berdasarkan kromosom dari luar
@@ -43,7 +53,6 @@ public class Individual implements Comparable<Individual> {
         this.MyRand = MyRand;
         this.chromosome = chromosome;
 
-        
         this.fitness = setFitness(chromosome);
         this.parentProbability = 0;
     }
@@ -75,7 +84,7 @@ public class Individual implements Comparable<Individual> {
     }
 
     static boolean isValidCoordinate(int x, int y) {
-        if (map[x][y] == 0)
+        if (map[x][y] != 2)
             return true;
         return false;
     }
@@ -88,95 +97,93 @@ public class Individual implements Comparable<Individual> {
         return true;
     }
 
-    static boolean isValid(int row, int col, boolean[][] visited) {
+    static boolean isValid(int row, int col) {
         return row >= 0 && row < map.length &&
                 col >= 0 && col < map[0].length &&
-                !visited[row][col] &&
-                map[row][col] == 0; /// 0 = kosong
+                map[row][col] != 2; /// 0 = kosong
     }
 
     // menghitung fitness dengan masukan list of item dan kapasitas knapsack
     public int setFitness(StationLocation[] fireStation) {
-        int totalCost = 0;
+        int m = map.length;
+        int n = map[0].length;
 
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < map[i].length; j++) {
-                if (map[i][j] == 1) {
-                    // do bfs
-                    int cost = shortestPath(i, j, fireStation);
-                    if (cost == -1)
-                        return Integer.MAX_VALUE;
+        // Peta jarak, diisi dengan tak hingga
+        int[][] dist = new int[m][n];
+        for (int[] row : dist) {
+            Arrays.fill(row, Integer.MAX_VALUE);
+        }
 
-                    totalCost += cost;
+        // Queue Multi-Source BFS
+        Queue<Coordinate> q = new LinkedList<>();
+
+        // Tambahkan semua stasiun sebagai sumber
+        for (StationLocation station : fireStation) {
+            int r = station.getX();
+            int c = station.getY();
+
+            // Pastikan stasiun valid (dalam peta dan bukan di pohon)
+            // Stasiun bisa di jalan (0) atau di rumah (1)
+            if (isValid(r, c)) {
+                if (dist[r][c] == Integer.MAX_VALUE) { // Hindari duplikat jika 2 stasiun di 1 titik
+                    dist[r][c] = 0;
+                    q.offer(new Coordinate(r, c, 0));
                 }
             }
         }
-        return totalCost;
-    }
-
-    // BFS function to find the shortest distance
-    // from 's' to 'd' in the matrix
-    static int shortestPath(int xRow, int yCol, StationLocation[] fireStation) {
-        int n = map.length;
-        int m = map[0].length;
-
-        // Direction vectors for moving: up, down, left, right
-        int[] dRow = { -1, 1, 0, 0 };
-        int[] dCol = { 0, 0, -1, 1 };
-
-        // Visited matrix to keep track of explored cells
-        boolean[][] visited = new boolean[map.length][map[0].length];
-
-        // Queue to perform BFS: stores {row, col, distance}
-        Queue<int[]> q = new LinkedList<>();
-
-        q.offer(new int[] { xRow, yCol, 0 });
-        visited[xRow][yCol] = true;
-
-        // Standard BFS loop
+        // BFS (hanya di jalan, sel '0')
         while (!q.isEmpty()) {
+            Coordinate curr = q.poll();
+            int r = curr.getX();
+            int c = curr.getY();
+            int d = curr.getDistance();
 
-            int[] curr = q.poll();
-
-            int row = curr[0];
-            int col = curr[1];
-            int dist = curr[2];
-
-            if (!notChosenYet(row, col, fireStation)) { // kalo sampe firestation, return distancenya
-                return dist;
-            }
-
-            // Explore all four adjacent directions
             for (int i = 0; i < 4; i++) {
-                int newRow = row + dRow[i];
-                int newCol = col + dCol[i];
+                int newRow = r + dRow[i];
+                int newCol = c + dCol[i];
 
-                // If new cell is valid and can be visited
-                if (isValid(newRow, newCol, visited)) {
-
-                    // Mark the new cell as visited
-                    visited[newRow][newCol] = true;
-
-                    // Push the new cell with updated distance
-                    q.offer(new int[] { newRow, newCol, dist + 1 });
+                // Cek di map, cuma jalan (0), dan belum dikunjungi (dist masih MAX)
+                if (isValid(newRow, newCol)
+                        && dist[newRow][newCol] == Integer.MAX_VALUE) {
+                    dist[newRow][newCol] = d + 1;
+                    q.offer(new Coordinate(newRow, newCol, d + 1));
                 }
             }
         }
 
-        // If no path to destination is found, return max value
-        return -1;
+        // itung total biaya dari rumah yang sudah disimpan
+        int totalCost = 0;
+        for (Coordinate house : houseLocations) {
+            int r = house.getX();
+            int c = house.getY();
+
+            // Ambil jarak langsung ke sel rumah,
+            // karena BFS kita sekarang bisa berjalan di atas rumah (1)
+            int costToThisHouse = dist[r][c];
+
+            // Cek jika rumah ini benar-benar terisolasi (dikelilingi pohon)
+            if (costToThisHouse == Integer.MAX_VALUE) {
+                return Integer.MAX_VALUE; // State tidak valid, beri penalti tertinggi
+            }
+
+            // Jika stasiun di atas rumah, costToThisHouse == 0
+            // Jika stasiun 5 langkah, costToThisHouse == 5
+            // Tidak perlu +1, karena jaraknya sudah dihitung ke sel rumah
+            totalCost += costToThisHouse;
+        }
+
+        return totalCost;
     }
 
     public void doMutation() {
         // Pilih 1 fireStation untuk dimutasi
-        //random : 0 - (n-1)
+        // random : 0 - (n-1)
         int mutation = this.MyRand.nextInt(banyakFireStation);
 
         // Pilih x / y untuk dimutasi
         int i = this.MyRand.nextInt(2);
 
         // i == 0 : mutasi x, i == 1 : mutasi y
-        // Bisa eksperimen di mutasi
         if (i == 0)
             this.chromosome[mutation].setX((this.chromosome[mutation].getX() + 1) % map.length);
         else
@@ -193,7 +200,7 @@ public class Individual implements Comparable<Individual> {
         Individual child2 = new Individual(this.MyRand, this.chromosome);
 
         // Menentukan potongan untuk crossover
-        int rangeIndex = (int)(Math.ceil(((banyakFireStation * 1.0) / 3.0)));
+        int rangeIndex = (int) (Math.ceil(((banyakFireStation * 1.0) / 3.0)));
         // System.out.println("_----------------------");
         // System.out.println(banyakFireStation);
         // System.out.println(rangeIndex);
@@ -272,7 +279,7 @@ public class Individual implements Comparable<Individual> {
     @Override
     public String toString() {
         String res = "Individual Fitness: " + this.fitness + "\n";
-        for(int i = 0; i < chromosome.length; i++){
+        for (int i = 0; i < chromosome.length; i++) {
             res += chromosome[i].toString();
         }
 

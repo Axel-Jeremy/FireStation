@@ -102,15 +102,6 @@ public class MySA {
                 && map[row][col] != 2;
     }
 
-    static StationLocation[] deepCopy(StationLocation[] original) {
-        StationLocation[] copy = new StationLocation[original.length];
-        for (int i = 0; i < original.length; i++) {
-            copy[i] = new StationLocation(original[i].getX(), original[i].getY());
-        }
-        return copy;
-    }
-    
-
     // Mencari neighbor state di antara [-stepSize, stepSize]
     private StationLocation[] getNeighbor(int x, int y, double stepSize) {
         StationLocation[] neighborCoordinates = new StationLocation[4]; // array neighbor state, 4 karena neighbor hanya
@@ -167,7 +158,7 @@ public class MySA {
     }
 
     private static boolean isValidCoordinate(int x, int y) { // cek x dan y
-        if (map[x][y] != 2) // kalo jalan kosong (bukan pohon/rumah)
+        if (map[x][y] == 0) // kalo jalan kosong (bukan pohon/rumah)
             return true; // valid
         return false; // else, tidak valid
     }
@@ -204,20 +195,18 @@ public class MySA {
         StationLocation[] bestState = randPos;
         StationLocation[] currentState = randPos;
         double bestF = currentF;
-
-        double currentStepSize = stepSize;
-
         double T = t0; // schedule(t)
+        double currentStepSize = stepSize; // stepSize awal
+
         while (true) { // sampai lebih kecil dari stopping_temp atau bisa diiterasi juga
             if (T < stopping_temp)
                 break;
             // successor state: "perturbation" via gaussian (mean = 0, deviasi = stepSize)
-            // getneighbor\
+            // getneighbor
 
             currentStepSize = stepSize * (T / t0);
             if (currentStepSize < 1.0)
                 currentStepSize = 1.0; // jangan sampai 0
-
             int randomIdx = rnd.nextInt(banyakFireStation); // dari banyak firestation, pilih 1 random
 
             StationLocation[] neighborStates = getNeighbor(currentState[randomIdx].getX(),
@@ -227,9 +216,8 @@ public class MySA {
             // buat neighbor state-nya
             StationLocation[] topNeighborStates = null;
             double topF = Integer.MAX_VALUE;
-            if (isNotOutOfBound(neighborStates[0])
-                    && isValidCoordinate(neighborStates[0].getX(), neighborStates[0].getY())) {
-                topNeighborStates = deepCopy(currentState); // GUNAKAN DEEP COPY
+            if (isNotOutOfBound(neighborStates[0])) {
+                topNeighborStates = currentState;
                 topNeighborStates[randomIdx].setX(neighborStates[0].getX());
                 topNeighborStates[randomIdx].setY(neighborStates[0].getY());
                 topF = f(topNeighborStates);
@@ -237,9 +225,8 @@ public class MySA {
 
             StationLocation[] rightNeighborStates = null;
             double rightF = Integer.MAX_VALUE;
-            if (isNotOutOfBound(neighborStates[1])
-                    && isValidCoordinate(neighborStates[1].getX(), neighborStates[1].getY())) {
-                rightNeighborStates = deepCopy(currentState); // GUNAKAN DEEP COPY
+            if (isNotOutOfBound(neighborStates[1])) {
+                rightNeighborStates = currentState;
                 rightNeighborStates[randomIdx].setX(neighborStates[1].getX());
                 rightNeighborStates[randomIdx].setY(neighborStates[1].getY());
                 rightF = f(rightNeighborStates);
@@ -247,9 +234,8 @@ public class MySA {
 
             StationLocation[] bottomNeighborStates = null;
             double bottomF = Integer.MAX_VALUE;
-            if (isNotOutOfBound(neighborStates[2])
-                    && isValidCoordinate(neighborStates[2].getX(), neighborStates[2].getY())) {
-                bottomNeighborStates = deepCopy(currentState); // GUNAKAN DEEP COPY
+            if (isNotOutOfBound(neighborStates[2])) {
+                bottomNeighborStates = currentState;
                 bottomNeighborStates[randomIdx].setX(neighborStates[2].getX());
                 bottomNeighborStates[randomIdx].setY(neighborStates[2].getY());
                 bottomF = f(bottomNeighborStates);
@@ -257,9 +243,8 @@ public class MySA {
 
             StationLocation[] leftNeighborStates = null;
             double leftF = Integer.MAX_VALUE;
-            if (isNotOutOfBound(neighborStates[3])
-                    && isValidCoordinate(neighborStates[3].getX(), neighborStates[3].getY())) {
-                leftNeighborStates = deepCopy(currentState); // GUNAKAN DEEP COPY
+            if (isNotOutOfBound(neighborStates[3])) {
+                leftNeighborStates = currentState;
                 leftNeighborStates[randomIdx].setX(neighborStates[3].getX());
                 leftNeighborStates[randomIdx].setY(neighborStates[3].getY());
                 leftF = f(leftNeighborStates);
