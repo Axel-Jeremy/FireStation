@@ -18,7 +18,7 @@ public class Main {
 
         try {
             // input dari file input.txt
-            sc = new Scanner(new File("input_medium.txt"));
+            sc = new Scanner(new File("input_large.txt"));
 
             // ukuran peta
             n = sc.nextInt();
@@ -54,11 +54,11 @@ public class Main {
             e.printStackTrace();
         }
 
-        double starting_temp = Double.parseDouble(args[0]);
-        double cooling_rate = Double.parseDouble(args[1]);
-        double stopping_temp = Double.parseDouble(args[2]);
-        double stepSize = Double.parseDouble(args[3]);
-        int runs = Integer.parseInt(args[4]);
+        double starting_temp = Double.parseDouble(args[0]); //100
+        double cooling_rate = Double.parseDouble(args[1]); //0.999
+        double stopping_temp = Double.parseDouble(args[2]); //0.0001
+        double stepSize = Double.parseDouble(args[3]); //0.1
+        int runs = Integer.parseInt(args[4]); // 10Dstarti
         int i = 1;
 
         Random init = new Random(); // random generator untuk membuat seed
@@ -94,7 +94,7 @@ public class Main {
         System.out.println("======================================");
         System.out.println("Seed: " + seed);
         System.out.println("======================================");
-        System.out.printf("Best F: %.5f\n", ((1.0 * bestF) / (1.0 * h)));
+        System.out.printf("Best F: %.5f\n", ((1.0 * bestF)));
         System.out.printf("p: %d, Average: %.5f\n", p, ((1.0 * bestF) / (1.0 * h)));
         System.out.println("======================================");
 

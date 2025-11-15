@@ -18,7 +18,7 @@ public class Main {
 
         try {
             // input dari file input.txt
-            sc = new Scanner(new File("input.txt"));
+            sc = new Scanner(new File("input_large_copy.txt"));
 
             // ukuran peta
             n = sc.nextInt();
