@@ -36,7 +36,7 @@ public class FireStationGA {
             // ebelumnya sudah masuk
             Population newPop = currentPop.getNewPopulationWElit();
             while (newPop.isFilled() == false) { // selain elitism, sisanya diisi dengan crossover
-                Individual[] parents = currentPop.selectParent(); // pilih parent
+                Individual[] parents = currentPop.selectParentByRank(); // pilih parent
                 if (this.MyRand.nextDouble() < this.crossoverRate) { // apakah terjadi kawin silang?
                     Individual[] child = parents[0].doCrossover(parents[1]); // jika ya, crossover kedua parent untuk
                                                                              // mendapatkan satu anak

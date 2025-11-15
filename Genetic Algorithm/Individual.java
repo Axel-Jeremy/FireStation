@@ -44,7 +44,7 @@ public class Individual implements Comparable<Individual> {
         Individual.banyakFireStation = banyakFireStation;
     }
 
-    public static void setHouseLocation(List<Coordinate> houseLocations){
+    public static void setHouseLocation(List<Coordinate> houseLocations) {
         Individual.houseLocations = houseLocations;
     }
 
@@ -196,36 +196,33 @@ public class Individual implements Comparable<Individual> {
     // kemudian pilihannya bisa diambil anak terbaik saja, atau kedua anak masuk ke
     // dalam populasi berikutnya
     public Individual[] doCrossover(Individual other) {
-        Individual child1 = new Individual(this.MyRand, this.chromosome);
-        Individual child2 = new Individual(this.MyRand, this.chromosome);
+        // 1. Buat array kromosom BARU untuk anak-anak
+        StationLocation[] child1Chromosome = new StationLocation[banyakFireStation];
+        StationLocation[] child2Chromosome = new StationLocation[banyakFireStation];
 
-        // Menentukan potongan untuk crossover
+        // 2. Tentukan titik potong (logika Anda sudah OK)
         int rangeIndex = (int) (Math.ceil(((banyakFireStation * 1.0) / 3.0)));
-        // System.out.println("_----------------------");
-        // System.out.println(banyakFireStation);
-        // System.out.println(rangeIndex);
         int potongan = this.MyRand.nextInt(rangeIndex) + rangeIndex;
 
-        // random(17) + 7
-        // 7 - 17+7
-        // n/2 random(3) + 3 -> 3-4
-        // 1 2 3 | 4 5 6 7 | 8 9
-
-        // System.out.println(pos);
-
-        // Gabungkan parent ke anak
-        for (int i = 0; i <= potongan; i++) {
-            child1.chromosome[i] = this.chromosome[i];
-            child2.chromosome[i] = other.chromosome[i];
+        // 3. Lakukan crossover dengan menyalin gen (DEEP COPY)
+        for (int i = 0; i < banyakFireStation; i++) {
+            if (i <= potongan) {
+                // Anak 1 mengambil dari Parent 1 (this)
+                child1Chromosome[i] = new StationLocation(this.chromosome[i].getX(), this.chromosome[i].getY());
+                // Anak 2 mengambil dari Parent 2 (other)
+                child2Chromosome[i] = new StationLocation(other.chromosome[i].getX(), other.chromosome[i].getY());
+            } else {
+                // Anak 1 mengambil dari Parent 2 (other)
+                child1Chromosome[i] = new StationLocation(other.chromosome[i].getX(), other.chromosome[i].getY());
+                // Anak 2 mengambil dari Parent 1 (this)
+                child2Chromosome[i] = new StationLocation(this.chromosome[i].getX(), this.chromosome[i].getY());
+            }
         }
-        for (int i = potongan + 1; i < banyakFireStation; i++) {
-            child1.chromosome[i] = other.chromosome[i];
-            child2.chromosome[i] = this.chromosome[i];
-        }
-        // System.out.println(this);
-        // System.out.println(other);
-        // System.out.println(child);
-        // System.out.println("-----");
+
+        // 4. Buat objek Individual BARU dengan kromosom baru yang aman
+        Individual child1 = new Individual(this.MyRand, child1Chromosome);
+        Individual child2 = new Individual(this.MyRand, child2Chromosome);
+
         return new Individual[] { child1, child2 };
     }
 
