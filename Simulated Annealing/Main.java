@@ -18,7 +18,7 @@ public class Main {
 
         try {
             // input dari file input.txt
-            sc = new Scanner(new File("input.txt"));
+            sc = new Scanner(new File("input_medium.txt"));
 
             // ukuran peta
             n = sc.nextInt();
@@ -62,8 +62,7 @@ public class Main {
         int i = 1;
 
         Random init = new Random(); // random generator untuk membuat seed
-        long seed = init.nextLong() % 1000; // simpan seed sebagai seed untuk random generator
-        Random gen = new Random(seed); // random generator Hill Climbing
+        long seed = 69; // simpan seed sebagai seed untuk random generator
 
         MySA sa = new MySA(seed, houseLocations, p, h, map);
 

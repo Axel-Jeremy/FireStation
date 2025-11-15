@@ -155,6 +155,7 @@ public class Individual implements Comparable<Individual> {
 
         // itung total biaya dari rumah yang sudah disimpan
         int totalCost = 0;
+        int unreachedHouse = 0;
         for (Coordinate house : houseLocations) {
             int r = house.getX();
             int c = house.getY();
@@ -163,18 +164,17 @@ public class Individual implements Comparable<Individual> {
             // karena BFS kita sekarang bisa berjalan di atas rumah (1)
             int costToThisHouse = dist[r][c];
 
-            // Cek jika rumah ini benar-benar terisolasi (dikelilingi pohon)
+            // Cek jika rumah ini tidak terjangkau oleh firestation
             if (costToThisHouse == Integer.MAX_VALUE) {
-                return Integer.MAX_VALUE; // State tidak valid, beri penalti tertinggi
+                unreachedHouse++;
+            } else {
+                // Jika stasiun di atas rumah, costToThisHouse == 0
+                // Jika stasiun 5 langkah, costToThisHouse == 5
+                // Tidak perlu +1, karena jaraknya sudah dihitung ke sel rumah
+                totalCost += costToThisHouse;
             }
-
-            // Jika stasiun di atas rumah, costToThisHouse == 0
-            // Jika stasiun 5 langkah, costToThisHouse == 5
-            // Tidak perlu +1, karena jaraknya sudah dihitung ke sel rumah
-            totalCost += costToThisHouse;
         }
-
-        return totalCost;
+        return totalCost + unreachedHouse * (map.length * map[0].length);
     }
 
     public void doMutation() {

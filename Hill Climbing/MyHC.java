@@ -15,7 +15,7 @@ public class MyHC {
     static int dRow[] = { -1, 0, 1, 0 };
     static int dCol[] = { 0, 1, 0, -1 };
 
-    public MyHC(long seed, List<Coordinate> houseLocations, int banyakFireStation, int banyakRumah, int[][] map){
+    public MyHC(long seed, List<Coordinate> houseLocations, int banyakFireStation, int banyakRumah, int[][] map) {
         rnd = new Random(seed);
         this.houseLocations = houseLocations;
         this.banyakFireStation = banyakFireStation;
@@ -44,7 +44,6 @@ public class MyHC {
             int c = station.getY();
 
             // Pastikan stasiun valid (dalam peta dan bukan di pohon)
-            // Stasiun bisa di jalan (0) atau di rumah (1)
             if (isValid(r, c)) {
                 if (dist[r][c] == Integer.MAX_VALUE) { // Hindari duplikat jika 2 stasiun di 1 titik
                     dist[r][c] = 0;
@@ -69,14 +68,15 @@ public class MyHC {
                         && dist[newRow][newCol] == Integer.MAX_VALUE) {
                     dist[newRow][newCol] = d + 1;
 
-                    if(map[newRow][newCol] == 0)
-                    q.offer(new Coordinate(newRow, newCol, d + 1));
+                    if (map[newRow][newCol] == 0)
+                        q.offer(new Coordinate(newRow, newCol, d + 1));
                 }
             }
         }
 
         // itung total biaya dari rumah yang sudah disimpan
         int totalCost = 0;
+        int unreachedHouse = 0;
         for (Coordinate house : houseLocations) {
             int r = house.getX();
             int c = house.getY();
@@ -85,18 +85,17 @@ public class MyHC {
             // karena BFS kita sekarang bisa berjalan di atas rumah (1)
             int costToThisHouse = dist[r][c];
 
-            // Cek jika rumah ini benar-benar terisolasi (dikelilingi pohon)
+            // Cek jika rumah ini tidak terjangkau oleh firestation
             if (costToThisHouse == Integer.MAX_VALUE) {
-                return Integer.MAX_VALUE; // State tidak valid, beri penalti tertinggi
+                unreachedHouse++;
+            } else {
+                // Jika stasiun di atas rumah, costToThisHouse == 0
+                // Jika stasiun 5 langkah, costToThisHouse == 5
+                // Tidak perlu +1, karena jaraknya sudah dihitung ke sel rumah
+                totalCost += costToThisHouse;
             }
-
-            // Jika stasiun di atas rumah, costToThisHouse == 0
-            // Jika stasiun 5 langkah, costToThisHouse == 5
-            // Tidak perlu +1, karena jaraknya sudah dihitung ke sel rumah
-            totalCost += costToThisHouse;
         }
-
-        return totalCost;
+        return totalCost + unreachedHouse * (map.length * map[0].length);
     }
 
     // Function cek masih dalam batas length dan (row,col) adalah jalan kosong
@@ -130,7 +129,7 @@ public class MyHC {
     // generate random koordinat firestation
     private StationLocation[] generateRandomCoordinates() {
         // array buat simpen koordinat random sebanyak n firestation
-        StationLocation[] stationCoordinates = new StationLocation[banyakFireStation]; 
+        StationLocation[] stationCoordinates = new StationLocation[banyakFireStation];
 
         for (int i = 0; i < stationCoordinates.length; i++)
             stationCoordinates[i] = new StationLocation(-1, -1);
@@ -167,7 +166,7 @@ public class MyHC {
     }
 
     private boolean notChosenYet(int x, int y, StationLocation[] neighborCoordinates) { // cek apakah x dan y udah
-                                                                                       // dipilih
+                                                                                        // dipilih
         for (int i = 0; i < neighborCoordinates.length; i++) {
             if (x == neighborCoordinates[i].getX()
                     && y == neighborCoordinates[i].getY())
@@ -299,7 +298,7 @@ public class MyHC {
         for (int r = 1; r <= nRestarts; r++) { // ulangi nRestarts kali
             StationLocation[] bestCurrentState = hillClimbing(step, iter); // state terbaik hasil HC
             double currentF = f(bestCurrentState); // f(x)-nya
-            //System.out.println("currentF: " + currentF);
+            // System.out.println("currentF: " + currentF);
             if (currentF < bestF) { // simpan f(x) terbaik;
                 bestF = currentF;
                 bestState = bestCurrentState;
