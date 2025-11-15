@@ -275,9 +275,9 @@ public class Individual implements Comparable<Individual> {
 
     @Override
     public String toString() {
-        String res = "Individual Fitness: " + this.fitness + "\n";
+        String res = "";
         for (int i = 0; i < chromosome.length; i++) {
-            res += chromosome[i].toString();
+            res += String.format("Firestation #%d : %s",i+1, chromosome[i]);
         }
 
         return res;

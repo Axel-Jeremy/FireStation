@@ -71,48 +71,39 @@ public class Main {
         double bestF = sa.f(bestState);
 
         while (i++ <= runs) { // lakukan sebanyak runs kali
-            System.out.printf("Run %d\n", i - 1);
+            // System.out.printf("Run %d\n", i - 1);
             // hasil SA terbaik
             StationLocation[] currentState = sa.simulatedAnnealing(starting_temp, cooling_rate,
                     stopping_temp, stepSize);
             double currentF = sa.f(currentState); // hitung f(x) dari hasil SA
-            System.out.printf("Simulated Annealing result:\n");
-            System.out.printf("Current f = %.5f\n", ((1.0 * currentF) / (1.0 * h)));
+            // System.out.printf("Simulated Annealing result:\n");
+            // System.out.printf("Current f = %.5f\n", ((1.0 * currentF) / (1.0 * h)));
 
-            System.out.println("Current fire station coordinates (x, y):");
-            for (int k = 0; k < currentState.length; k++) {
-                System.out.printf("Firestation #%d : %s",k+1, currentState[k]);
-            }
+            // System.out.println("Current fire station coordinates (x, y):");
             // for (int k = 0; k < currentState.length; k++) {
-            // System.out.print("(");
-            // for (int j = 0; j < currentState.length; j++) {
-            // System.out.print(currentState[k].getX() + ", " + currentState[k].getY());
+            //     System.out.printf("Firestation #%d : %s",k+1, currentState[k]);
             // }
-            // System.out.println(")");
-            // }
-            System.out.println("----------------------------------------------------------");
+
+            // System.out.println("----------------------------------------------------------");
 
             if (currentF < bestF) { // simpan f(x) terbaik;
                 bestF = currentF;
                 bestState = currentState;
             }
         }
+        
+        System.out.println("======================================");
         System.out.println("Seed: " + seed);
         System.out.println("======================================");
-        System.out.printf("Simulated Annealing BEST:\n");
-        System.out.printf("Best f = %.5f\n", ((1.0 * bestF) / (1.0 * h)));
+        System.out.printf("Best F: %.5f\n", ((1.0 * bestF) / (1.0 * h)));
+        System.out.printf("p: %d, Average: %.5f\n", p, ((1.0 * bestF) / (1.0 * h)));
+        System.out.println("======================================");
 
-        System.out.println("Best fire station coordinates (x, y):");
+        System.out.println("Best Fire Station Coordinates (x, y):");
         for (int k = 0; k < bestState.length; k++) {
                 System.out.printf("Firestation #%d : %s",k+1, bestState[k]);
         }
-        // for (int k = 0; k < bestState.length; k++) {
-        // System.out.print("(");
-        // for (int j = 0; j < bestState.length; j++) {
-        // System.out.print(bestState[k].getX() + ", " + bestState[k].getY());
-        // }
-        // System.out.println(")");
-        // }
-        System.out.println("----------------------------------------------------------");
+        System.out.println("======================================");
+
     }
 }

@@ -304,8 +304,8 @@ public class MyHC {
             }
         }
         // System.out.println("======================================");
-        System.out.println("best: " + bestF);
-        System.out.printf("p: %d average: %.5f\n", banyakFireStation, ((1.0 * bestF) / (1.0 * banyakRumah)));
+        System.out.println("Best F: " + bestF);
+        System.out.printf("p: %d, Average: %.5f\n", banyakFireStation, ((1.0 * bestF) / (1.0 * banyakRumah)));
         System.out.println("======================================");
         return bestState;
     }
