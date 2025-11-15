@@ -18,7 +18,7 @@ public class Main {
 
         try {
             // input dari file input.txt
-            sc = new Scanner(new File("input_large.txt"));
+            sc = new Scanner(new File("input.txt"));
 
             // ukuran peta
             n = sc.nextInt();
@@ -54,21 +54,22 @@ public class Main {
             e.printStackTrace();
         }
 
-        System.out.println("------------------");
-
         Random init = new Random(); // random generator untuk membuat seed
         long seed = init.nextLong() % 1000; // simpan seed sebagai seed untuk random generator
         Random gen = new Random(seed); // random generator Hill Climbing
+
+        System.out.println("======================================");
+        System.out.println("Seed: " + seed);
+        System.out.println("======================================");
 
         MyHC hillClimbing = new MyHC(seed, houseLocations, p, h, map);
 
         StationLocation[] bestState = hillClimbing.randomRestartHC(1000, 5.0, Integer.parseInt(args[0]));
 
-        System.out.println("Seed: " + seed);
-        System.out.println("======================================");
         System.out.println("Best Fire Station Coordinates (x, y):");
         for (int i = 0; i < bestState.length; i++) {
-            System.out.printf("Firestation #%d : %s",i+1, bestState[i]);
+            System.out.printf("Firestation #%d : %s", i + 1, bestState[i]);
         }
+        System.out.println("======================================");
     }
 }

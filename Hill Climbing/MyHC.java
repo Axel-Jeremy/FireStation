@@ -297,14 +297,14 @@ public class MyHC {
         for (int r = 1; r <= nRestarts; r++) { // ulangi nRestarts kali
             StationLocation[] bestCurrentState = hillClimbing(step, iter); // state terbaik hasil HC
             double currentF = f(bestCurrentState); // f(x)-nya
-            System.out.println("currentF: " + currentF);
+            //System.out.println("currentF: " + currentF);
             if (currentF < bestF) { // simpan f(x) terbaik;
                 bestF = currentF;
                 bestState = bestCurrentState;
             }
         }
-        System.out.println("======================================");
-        System.out.println("best:" + bestF);
+        // System.out.println("======================================");
+        System.out.println("best: " + bestF);
         System.out.printf("p: %d average: %.5f\n", banyakFireStation, ((1.0 * bestF) / (1.0 * banyakRumah)));
         System.out.println("======================================");
         return bestState;
