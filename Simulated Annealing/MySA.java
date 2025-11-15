@@ -62,10 +62,12 @@ public class MySA {
                 int newRow = r + dRow[i];
                 int newCol = c + dCol[i];
 
-                // Cek di map, cuma jalan (0), dan belum dikunjungi (dist masih MAX)
+                // Cek di koordinat baru di map, dan belum dikunjungi (dist masih MAX)
                 if (isValid(newRow, newCol)
                         && dist[newRow][newCol] == Integer.MAX_VALUE) {
                     dist[newRow][newCol] = d + 1;
+
+                    if(map[newRow][newCol] == 0)
                     q.offer(new Coordinate(newRow, newCol, d + 1));
                 }
             }
@@ -167,7 +169,7 @@ public class MySA {
     }
 
     private static boolean isValidCoordinate(int x, int y) { // cek x dan y
-        if (map[x][y] != 2) // kalo jalan kosong (bukan pohon/rumah)
+        if (map[x][y] == 0) // kalo jalan kosong (bukan pohon/rumah)
             return true; // valid
         return false; // else, tidak valid
     }

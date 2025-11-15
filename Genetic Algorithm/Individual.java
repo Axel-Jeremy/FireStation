@@ -84,7 +84,7 @@ public class Individual implements Comparable<Individual> {
     }
 
     static boolean isValidCoordinate(int x, int y) {
-        if (map[x][y] != 2)
+        if (map[x][y] == 0)
             return true;
         return false;
     }
@@ -146,6 +146,8 @@ public class Individual implements Comparable<Individual> {
                 if (isValid(newRow, newCol)
                         && dist[newRow][newCol] == Integer.MAX_VALUE) {
                     dist[newRow][newCol] = d + 1;
+
+                    if(map[newRow][newCol] == 0)
                     q.offer(new Coordinate(newRow, newCol, d + 1));
                 }
             }
