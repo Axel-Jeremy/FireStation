@@ -13,6 +13,14 @@ public class MySA {
     static int dRow[] = { -1, 0, 1, 0 };
     static int dCol[] = { 0, 1, 0, -1 };
 
+    /* Konstruktor class MySA
+     *
+     * @param seed = Generator angka acak
+     * @param houseLocation = berisi daftar lokasi rumah
+     * @param banyakFireStation = Jumlah firestation yang akan diset nantinya
+     * @param banyakRumah = jumlah rumah
+     * @param map = peta map 2 Dimensi
+    */
     public MySA(long seed, List<Coordinate> houseLocations, int banyakFireStation, int banyakRumah, int[][] map) {
         rnd = new Random(seed);
         this.houseLocations = houseLocations;
@@ -67,8 +75,8 @@ public class MySA {
                         && dist[newRow][newCol] == Integer.MAX_VALUE) {
                     dist[newRow][newCol] = d + 1;
 
-                    if(map[newRow][newCol] == 0)
-                    q.offer(new Coordinate(newRow, newCol, d + 1));
+                    if (map[newRow][newCol] == 0)
+                        q.offer(new Coordinate(newRow, newCol, d + 1));
                 }
             }
         }
@@ -90,9 +98,11 @@ public class MySA {
                 // Jika stasiun di atas rumah, costToThisHouse == 0
                 // Jika stasiun 5 langkah, costToThisHouse == 5
                 // Tidak perlu +1, karena jaraknya sudah dihitung ke sel rumah
-                totalCost += costToThisHouse; //tambahkan seluruh jarak ke rumah dari firestation
+                totalCost += costToThisHouse; // tambahkan seluruh jarak ke rumah dari firestation
             }
         }
+        // Tambahkan penalti untuk rumah yang tidak bisa terjangkau sehingga algoritma
+        // bisa memprioritaskan yang bisa di jangkau terlebih dahulu
         return totalCost + unreachedHouse * (map.length * map[0].length);
     }
 
@@ -103,14 +113,15 @@ public class MySA {
                 && map[row][col] != 2;
     }
 
+    // Membuat array copy dari StationLocation untuk menghindari mengubah bestate ketika iterasi
     static StationLocation[] deepCopy(StationLocation[] original) {
         StationLocation[] copy = new StationLocation[original.length];
         for (int i = 0; i < original.length; i++) {
+            // Buat objek stationLocation baru
             copy[i] = new StationLocation(original[i].getX(), original[i].getY());
         }
         return copy;
     }
-    
 
     // Mencari neighbor state di antara [-stepSize, stepSize]
     private StationLocation[] getNeighbor(int x, int y, double stepSize) {
@@ -190,22 +201,31 @@ public class MySA {
         return x >= 0 && x < map.length && y >= 0 && y < map[0].length;
     }
 
+    /*
+     * Menjalankan algoritma SA
+     * @param t0: Suhu awal
+     * @param cooling: Tingkat pendinginan
+     * @param stopping_temp: Suhu minimum untuk berhenti
+     * @param stepSize: Jarak "lompatan" awal
+     * @return: State terbaik yang ditemukan selama proses pendinginan.
+     */
     public StationLocation[] simulatedAnnealing(double t0, double cooling, double stopping_temp, double stepSize) {
         StationLocation[] randPos = generateRandomCoordinates(); // posisi awal random
-        double currentF = f(randPos);
+        double currentF = f(randPos); // cost awal
 
-        StationLocation[] bestState = randPos;
-        StationLocation[] currentState = randPos;
+        StationLocation[] bestState = randPos;      //State tebarik yang pernah ditemukan
+        StationLocation[] currentState = randPos;   // State saat ini dalam iterasi
         double bestF = currentF;
 
         double currentStepSize = stepSize;
+        double T = t0; // schedule(t) 
 
-        double T = t0; // schedule(t)
+        // Loop untuk pendinginan Suhu
         while (true) { // sampai lebih kecil dari stopping_temp atau bisa diiterasi juga
             if (T < stopping_temp)
                 break;
 
-            currentStepSize = stepSize * (T / t0); //hitung step size sekarang
+            currentStepSize = stepSize * (T / t0); // hitung step size sekarang
             if (currentStepSize < 1.0)
                 currentStepSize = 1.0; // jangan sampai 0
 
@@ -264,9 +284,9 @@ public class MySA {
             }
 
             StationLocation[] successorFireStation = null;
-            int randomSuccessorIdx = rnd.nextInt(4); //index random successor yang diambil
+            int randomSuccessorIdx = rnd.nextInt(4); // index random successor yang diambil
 
-            while (successorFireStation == null) { 
+            while (successorFireStation == null) {
                 randomSuccessorIdx = rnd.nextInt(4);
 
                 switch (randomSuccessorIdx) {
@@ -299,99 +319,100 @@ public class MySA {
             }
             T *= cooling; // turunkan suhu
         }
-        // return currentX;
-        return bestState;
+        return bestState; // Kembalikan state terbaik yang pernah ditemukan
     }
 
-    
-
-    // ABAIKAN
-    
-    // run: SA 100 0.999 0.0001 0.1
-    // public static void main(String[] args) {
-    // Scanner sc = new Scanner(System.in);
-
-    // // ukuran peta
-    // int n = sc.nextInt();
-    // int m = sc.nextInt();
-
-    // map = new int[m][n];
-    // boolean[][] visited = new boolean[m][n];
-
-    // // banyak fire station
-    // int p = sc.nextInt();
-
-    // // banyak rumah
-    // int h = sc.nextInt();
-
-    // // banyak pohon
-    // int t = sc.nextInt();
-
-    // // input koordinat rumah
-    // for (int i = 0; i < h; i++) {
-    // int x = sc.nextInt();
-    // int y = sc.nextInt();
-    // map[m - y][x - 1] = 1;
-    // }
-
-    // // input koordinat pohon
-    // for (int i = 0; i < t; i++) {
-    // int x = sc.nextInt();
-    // int y = sc.nextInt();
-    // map[m - y][x - 1] = 2;
-    // }
-    // sc.close();
-
-    // banyakFireStation = p;
-    // banyakRumah = h;
-
-    // double starting_temp = Double.parseDouble(args[0]);
-    // double cooling_rate = Double.parseDouble(args[1]);
-    // double stopping_temp = Double.parseDouble(args[2]);
-    // double stepSize = Double.parseDouble(args[3]);
-    // int runs = Integer.parseInt(args[4]);
-    // int i = 1;
-
-    // StationLocation[] bestState = generateRandomCoordinates();
-    // double bestF = f(bestState);
-
-    // while (i++ <= runs) { // lakukan sebanyak runs kali
-    // System.out.printf("Run %d\n", i - 1);
-    // // hasil SA terbaik
-    // StationLocation[] currentState = simulatedAnnealing(starting_temp,
-    // cooling_rate, stopping_temp, stepSize);
-    // double currentF = f(currentState); // hitung f(x) dari hasil SA
-    // System.out.printf("Simulated Annealing result:\n");
-    // System.out.printf("Current f = %.5f\n", ((1.0 * currentF) / (1.0 *
-    // banyakRumah)));
-
-    // System.out.println("Current fire station coordinates (x, y):");
-    // for (int k = 0; k < currentState.length; k++) {
-    // System.out.print("(");
-    // for (int j = 0; j < currentState[k].length; j++) {
-    // System.out.print(currentState[k][j] + "");
-    // }
-    // System.out.println(")");
-    // }
-    // System.out.println("----------------------------------------------------------");
-
-    // if (currentF < bestF) { // simpan f(x) terbaik;
-    // bestF = currentF;
-    // bestState = currentState;
-    // }
-    // }
-
-    // System.out.printf("Simulated Annealing BEST:\n");
-    // System.out.printf("Best f = %.5f\n", ((1.0 * bestF) / (1.0 * banyakRumah)));
-
-    // System.out.println("Best fire station coordinates (x, y):");
-    // for (int k = 0; k < bestState.length; k++) {
-    // System.out.print("(");
-    // for (int j = 0; j < bestState[k].length; j++) {
-    // System.out.print(bestState[k][j] + "");
-    // }
-    // System.out.println(")");
-    // }
-    // System.out.println("----------------------------------------------------------");
-    // }
+    /*
+     * ABAIKAN
+     * 
+     * run: SA 100 0.999 0.0001 0.1
+     * public static void main(String[] args) {
+     * Scanner sc = new Scanner(System.in);
+     * 
+     * // ukuran peta
+     * int n = sc.nextInt();
+     * int m = sc.nextInt();
+     * 
+     * map = new int[m][n];
+     * boolean[][] visited = new boolean[m][n];
+     * 
+     * // banyak fire station
+     * int p = sc.nextInt();
+     * 
+     * // banyak rumah
+     * int h = sc.nextInt();
+     * 
+     * // banyak pohon
+     * int t = sc.nextInt();
+     * 
+     * // input koordinat rumah
+     * for (int i = 0; i < h; i++) {
+     * int x = sc.nextInt();
+     * int y = sc.nextInt();
+     * map[m - y][x - 1] = 1;
+     * }
+     * 
+     * // input koordinat pohon
+     * for (int i = 0; i < t; i++) {
+     * int x = sc.nextInt();
+     * int y = sc.nextInt();
+     * map[m - y][x - 1] = 2;
+     * }
+     * sc.close();
+     * 
+     * banyakFireStation = p;
+     * banyakRumah = h;
+     * 
+     * double starting_temp = Double.parseDouble(args[0]);
+     * double cooling_rate = Double.parseDouble(args[1]);
+     * double stopping_temp = Double.parseDouble(args[2]);
+     * double stepSize = Double.parseDouble(args[3]);
+     * int runs = Integer.parseInt(args[4]);
+     * int i = 1;
+     * 
+     * StationLocation[] bestState = generateRandomCoordinates();
+     * double bestF = f(bestState);
+     * 
+     * while (i++ <= runs) { // lakukan sebanyak runs kali
+     * System.out.printf("Run %d\n", i - 1);
+     * // hasil SA terbaik
+     * StationLocation[] currentState = simulatedAnnealing(starting_temp,
+     * cooling_rate, stopping_temp, stepSize);
+     * double currentF = f(currentState); // hitung f(x) dari hasil SA
+     * System.out.printf("Simulated Annealing result:\n");
+     * System.out.printf("Current f = %.5f\n", ((1.0 * currentF) / (1.0 *
+     * banyakRumah)));
+     * 
+     * System.out.println("Current fire station coordinates (x, y):");
+     * for (int k = 0; k < currentState.length; k++) {
+     * System.out.print("(");
+     * for (int j = 0; j < currentState[k].length; j++) {
+     * System.out.print(currentState[k][j] + "");
+     * }
+     * System.out.println(")");
+     * }
+     * System.out.println(
+     * "----------------------------------------------------------");
+     * 
+     * if (currentF < bestF) { // simpan f(x) terbaik;
+     * bestF = currentF;
+     * bestState = currentState;
+     * }
+     * }
+     * 
+     * System.out.printf("Simulated Annealing BEST:\n");
+     * System.out.printf("Best f = %.5f\n", ((1.0 * bestF) / (1.0 * banyakRumah)));
+     * 
+     * System.out.println("Best fire station coordinates (x, y):");
+     * for (int k = 0; k < bestState.length; k++) {
+     * System.out.print("(");
+     * for (int j = 0; j < bestState[k].length; j++) {
+     * System.out.print(bestState[k][j] + "");
+     * }
+     * System.out.println(")");
+     * }
+     * System.out.println(
+     * "----------------------------------------------------------");
+     * }
+     */
 }

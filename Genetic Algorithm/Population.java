@@ -1,28 +1,40 @@
 import java.util.*;
 
+/**
+ * Mengelola seluruh populasiuntuk GA, untuk membuat populasi awal, mengelola elitism,
+ * dan memilih orang tua (parent selection).
+ */
+
 public class Population {
-    public ArrayList<Individual> population;
-    private int maxPopulationSize;
-    private int populationSize = 0;
-    public double elitismPct;
+    public ArrayList<Individual> population; // list dari semua individu
+    private int maxPopulationSize; // Ukuran maksimal dari populasi
+    private int populationSize = 0; // Ukuran saat ini dari populasi
+    public double elitismPct; // Persentase individu terbaik akan terbawa ke gen selanjutnya
     int maxCapacity; // banyak firestation yang di deklarasi
-    int sumRank = 0;
-    Random MyRand;
+    int sumRank = 0; // Jumlah total peringkat untuk rank selection
+    Random MyRand; 
     static int[][] map;
 
-    public Population(Random MyRand, int maxCapacity, int maxPopulationSize,
-            double elitismPct) {
-        // skala 0-1
+    /**
+     * Konstruktor untuk membuat objek populasi baru (awalnya kosong).
+     * @param MyRand Generator acak
+     * @param maxCapacity ukuran maksimal
+     * @param maxPopulationSize Ukuran populasi yang diinginkan
+     * @param elitismPct Persentase elitism
+     */
+    public Population(Random MyRand, int maxCapacity, int maxPopulationSize, double elitismPct) {
         this.MyRand = MyRand; // menggunakan random generator dari luar
         this.maxPopulationSize = maxPopulationSize;
         this.population = new ArrayList<Individual>();
         this.elitismPct = elitismPct;
         this.maxCapacity = maxCapacity;
+
         for (int i = 1; i <= this.maxPopulationSize; i++)
             this.sumRank = this.sumRank + i;
 
     }
 
+    // Mengisi populasi dengan individu acak dan akan digunakan untuk membuat populasi di gen 1
     public void randomPopulation() { 
         for (int i = 0; i < this.maxPopulationSize; i++) {
             this.addIndividual(new Individual(this.MyRand));
@@ -41,6 +53,7 @@ public class Population {
         for (Individual individu : population) {
             individu.setFitness(individu.chromosome);
         }
+        // Lakukan pengurutan populasi dimana fitness terendah di indeks 0 (paling bagus)
         Collections.sort(this.population);
     }
 
@@ -62,6 +75,7 @@ public class Population {
         return newPop;
     }
 
+    // Memeriksa apakah populasi sudah penuh atau belum
     public boolean isFilled() {
         return this.maxPopulationSize == this.populationSize;
     }

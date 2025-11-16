@@ -1,19 +1,24 @@
+// Class berfungsi sebagai struktur data yang akan menyimpan koordinat (x,y) dan jarak (distance) untuk keperluan BFS
+
 public class Coordinate {
     private int x;
     private int y;
     private int distance;
 
+    // Konstruktor untuk keperluan queue dari BFS
     public Coordinate(int x, int y, int distance) {
-        this.x = x;
-        this.y = y;
+        this.x = x; // Koordinat x (Baris)
+        this.y = y; // Koordinat y (Kolom)
         this.distance = distance;
     }
 
+    // Konstruktor untuk menyimpan lokasi
     public Coordinate(int x, int y) {
-        this.x = x;
-        this.y = y;
+        this.x = x; // Koordinat x (Baris)
+        this.y = y; // Koordinat y (Kolom)
     }
 
+    // Getter dan Setter
     public int getX() {
         return x;
     }

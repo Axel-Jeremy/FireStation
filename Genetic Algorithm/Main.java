@@ -9,18 +9,18 @@ public class Main {
 	public static void main(String[] args) {
 		Scanner sc;
 		// Ukuran Peta n*m
-		int n = 0;
+		int n = 0; 
 		int m = 0;
 
 		int p = 0; // Banyak Fire Station
 		int h = 0; // Banyak Rumah
 		int t = 0; // Banyak pohon
-		int[][] map = null;
-		List<Coordinate> houseLocations = new ArrayList<>();
+		int[][] map = null; // Grid peta
+		List<Coordinate> houseLocations = new ArrayList<>(); // Daftar lokasi rumah
 
 		try {
 			// input dari file input.txt
-			sc = new Scanner(new File("input.txt"));
+			sc = new Scanner(new File("input_medium.txt")); // Nama file input di ubah di sini
 
 			// ukuran peta
 			n = sc.nextInt();
@@ -72,9 +72,9 @@ public class Main {
 				sc = new Scanner(new File("param.txt"));
 				totalGeneration = sc.nextInt();
 				maxPopulationSize = sc.nextInt();
-				crossoverRate = sc.nextDouble(); // skala 0-1
-				mutationRate = sc.nextDouble(); // skala 0-1
-				elitismPct = sc.nextDouble(); // skala 0-1
+				crossoverRate = sc.nextDouble(); 
+				mutationRate = sc.nextDouble(); 
+				elitismPct = sc.nextDouble();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

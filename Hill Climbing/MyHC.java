@@ -13,6 +13,14 @@ public class MyHC {
     static int dRow[] = { -1, 0, 1, 0 };
     static int dCol[] = { 0, 1, 0, -1 };
 
+    /* Konstruktor class MyHC
+     *
+     * @param seed = Generator angka acak
+     * @param houseLocation = berisi daftar lokasi rumah
+     * @param banyakFireStation = Jumlah firestation yang akan diset nantinya
+     * @param banyakRumah = jumlah rumah
+     * @param map = peta map 2 Dimensi
+    */
     public MyHC(long seed, List<Coordinate> houseLocations, int banyakFireStation, int banyakRumah, int[][] map) {
         rnd = new Random(seed);
         this.houseLocations = houseLocations;
@@ -93,6 +101,8 @@ public class MyHC {
                 totalCost += costToThisHouse;
             }
         }
+        // Tambahkan penalti untuk rumah yang tidak bisa terjangkau sehingga algoritma
+        // bisa memprioritaskan yang bisa di jangkau terlebih dahulu
         return totalCost + unreachedHouse * (map.length * map[0].length);
     }
 
@@ -180,9 +190,11 @@ public class MyHC {
         return x >= 0 && x < map.length && y >= 0 && y < map[0].length;
     }
 
+    // Membuat array copy dari StationLocation untuk menghindari mengubah bestate ketika iterasi
     static StationLocation[] deepCopy(StationLocation[] original) {
         StationLocation[] copy = new StationLocation[original.length];
         for (int i = 0; i < original.length; i++) {
+            // Buat objek stationLocation baru
             copy[i] = new StationLocation(original[i].getX(), original[i].getY());
         }
         return copy;
@@ -204,6 +216,8 @@ public class MyHC {
 
         for (int it = 1; it <= maxIter; it++) { // lakukan sampai maxIter
             int randomIdx = rnd.nextInt(banyakFireStation); // dari banyak firestation, pilih 1 random
+
+            // Ambil 4 tetangga dari stasiun yang sudah dipilih
             StationLocation[] neighborStates = getNeighbor(bestState[randomIdx].getX(), bestState[randomIdx].getY(),
                     stepSize);
 
@@ -310,65 +324,66 @@ public class MyHC {
     }
 }
 
-
-//ABAIKAN
-// =========================================================================================
-// public static void main(String[] args) {
-// Scanner sc;
-// int n = 0;
-// int m = 0;
-// int p = 0;
-// int h = 0;
-// int t = 0;
-// boolean[][] visited;
-
-// try { // input dari file input.txt
-// sc = new Scanner(new File("input.txt"));
-
-// // ukuran peta
-// n = sc.nextInt();
-// m = sc.nextInt();
-
-// map = new int[m][n];
-// visited = new boolean[m][n];
-
-// // banyak fire station
-// p = sc.nextInt();
-
-// // banyak rumah
-// h = sc.nextInt();
-
-// // banyak pohon
-// t = sc.nextInt();
-
-// // input koordinat rumah
-// for (int i = 0; i < h; i++) {
-// int x = sc.nextInt();
-// int y = sc.nextInt();
-// map[m - y][x - 1] = 1;
-// houseLocations.add(new Coordinate(m - y, x - 1));
-// }
-
-// // input koordinat pohon
-// for (int i = 0; i < t; i++) {
-// int x = sc.nextInt();
-// int y = sc.nextInt();
-// map[m - y][x - 1] = 2;
-// }
-// sc.close();
-// } catch (FileNotFoundException e) {
-// e.printStackTrace();
-// }
-
-// System.out.println("------------------");
-
-// banyakFireStation = p;
-// banyakRumah = h;
-// StationLocation[] bestState = randomRestartHC(1000, 10.0,
-// Integer.parseInt(args[0]));
-
-// System.out.println("Best all fire station coordinates (x, y):");
-// for (int i = 0; i < bestState.length; i++) {
-// System.out.print(bestState[i]);
-// }
-// }
+/*
+ * ABAIKAN
+ * =============================================================================
+ * public static void main(String[] args) {
+ * Scanner sc;
+ * int n = 0;
+ * int m = 0;
+ * int p = 0;
+ * int h = 0;
+ * int t = 0;
+ * boolean[][] visited;
+ * 
+ * try { // input dari file input.txt
+ * sc = new Scanner(new File("input.txt"));
+ * 
+ * // ukuran peta
+ * n = sc.nextInt();
+ * m = sc.nextInt();
+ * 
+ * map = new int[m][n];
+ * visited = new boolean[m][n];
+ * 
+ * // banyak fire station
+ * p = sc.nextInt();
+ * 
+ * // banyak rumah
+ * h = sc.nextInt();
+ * 
+ * // banyak pohon
+ * t = sc.nextInt();
+ * 
+ * // input koordinat rumah
+ * for (int i = 0; i < h; i++) {
+ * int x = sc.nextInt();
+ * int y = sc.nextInt();
+ * map[m - y][x - 1] = 1;
+ * houseLocations.add(new Coordinate(m - y, x - 1));
+ * }
+ * 
+ * // input koordinat pohon
+ * for (int i = 0; i < t; i++) {
+ * int x = sc.nextInt();
+ * int y = sc.nextInt();
+ * map[m - y][x - 1] = 2;
+ * }
+ * sc.close();
+ * } catch (FileNotFoundException e) {
+ * e.printStackTrace();
+ * }
+ * 
+ * System.out.println("------------------");
+ * 
+ * banyakFireStation = p;
+ * banyakRumah = h;
+ * StationLocation[] bestState = randomRestartHC(1000, 10.0,
+ * Integer.parseInt(args[0]));
+ * 
+ * System.out.println("Best all fire station coordinates (x, y):");
+ * for (int i = 0; i < bestState.length; i++) {
+ * System.out.print(bestState[i]);
+ * }
+ * }
+ */
