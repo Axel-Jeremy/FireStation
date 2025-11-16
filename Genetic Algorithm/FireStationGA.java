@@ -32,8 +32,7 @@ public class FireStationGA {
 
         // algogen mulai di sini
         while (terminate(generation) == false) { // jika belum memenuhi kriteria terminasi
-            // buat populasi awal dengan elitism, bbrp individu terbaik dari populasi
-            // ebelumnya sudah masuk
+            // buat populasi awal dengan elitism, bbrp individu terbaik dari populasi sebelumnya
             Population newPop = currentPop.getNewPopulationWElit();
             while (newPop.isFilled() == false) { // selain elitism, sisanya diisi dengan crossover
                 Individual[] parents = currentPop.selectParentByRank(); // pilih parent
@@ -43,15 +42,11 @@ public class FireStationGA {
                     for (int i = 0; i < child.length; i++) {
                         if (this.MyRand.nextDouble() < this.mutationRate) { // apakah terjadi mutasi?
                             child[i].doMutation();
-                            // newPop.addIndividual(child[i]);
-                            // System.out.println(this.mutationRate);
                         }
-                        // System.out.println(i);
+
                     }
                     for (int i = 0; i < child.length; i++) {
-                        // if (this.MyRand.nextDouble() < this.mutationRate) { // apakah terjadi mutasi?
                         newPop.addIndividual(child[i]); // masukkan anak ke dalam populasi
-                        // }
                     }
                 }
             }
@@ -67,7 +62,5 @@ public class FireStationGA {
             return true;
         else
             return false;
-        // or by running time
-        // or population not changed
     }
 }
