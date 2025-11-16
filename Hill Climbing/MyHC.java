@@ -36,12 +36,13 @@ public class MyHC {
         // Queue Multi-Source BFS
         Queue<Coordinate> q = new LinkedList<>();
 
-        // Tambahkan semua stasiun sebagai sumber
+        // Tambahkan semua stasiun sebagai sumber (titik awal)
         for (StationLocation station : fireStation) {
             int r = station.getX();
             int c = station.getY();
 
             // Pastikan stasiun valid (dalam peta dan bukan di pohon)
+            // Stasiun hanya bisa di jalan (0)
             if (isValid(r, c)) {
                 if (dist[r][c] == Integer.MAX_VALUE) { // Hindari duplikat jika 2 stasiun di 1 titik
                     dist[r][c] = 0;
@@ -79,8 +80,7 @@ public class MyHC {
             int r = house.getX();
             int c = house.getY();
 
-            // Ambil jarak langsung ke sel rumah,
-            // karena BFS kita sekarang bisa berjalan di atas rumah (1)
+            // Ambil jarak langsung ke sel rumah
             int costToThisHouse = dist[r][c];
 
             // Cek jika rumah ini tidak terjangkau oleh firestation
@@ -310,6 +310,8 @@ public class MyHC {
     }
 }
 
+
+//ABAIKAN
 // =========================================================================================
 // public static void main(String[] args) {
 // Scanner sc;
