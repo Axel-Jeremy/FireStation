@@ -18,7 +18,7 @@ public class Main {
 
         try {
             // input dari file input.txt
-            sc = new Scanner(new File("input_large_copy.txt"));
+            sc = new Scanner(new File("input_large.txt"));
 
             // ukuran peta
             n = sc.nextInt();
@@ -55,7 +55,7 @@ public class Main {
         }
 
         Random init = new Random(); // random generator untuk membuat seed
-        long seed = init.nextLong() % 1000; // simpan seed sebagai seed untuk random generator
+        long seed = 69; //init.nextLong() % 1000; // simpan seed sebagai seed untuk random generator
 
         System.out.println("======================================");
         System.out.println("Seed: " + seed);
