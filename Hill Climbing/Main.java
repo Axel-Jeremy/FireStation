@@ -55,7 +55,7 @@ public class Main {
         }
 
         Random init = new Random(); // random generator untuk membuat seed
-        long seed = init.nextLong() % 1000; //69;  // simpan seed sebagai seed untuk random generator
+        long seed = init.nextLong() % 1000; //69;  // seed untuk random generator
 
         System.out.println("======================================");
         System.out.println("Seed: " + seed);
