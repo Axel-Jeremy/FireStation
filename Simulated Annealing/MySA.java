@@ -81,7 +81,6 @@ public class MySA {
             int c = house.getY();
 
             // Ambil jarak langsung ke sel rumah,
-            // karena BFS kita sekarang bisa berjalan di atas rumah (1)
             int costToThisHouse = dist[r][c];
 
             // Cek jika rumah ini tidak terjangkau oleh firestation
