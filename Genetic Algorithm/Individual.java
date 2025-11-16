@@ -6,8 +6,7 @@ import java.util.Queue;
 import java.util.Random;
 
 public class Individual implements Comparable<Individual> {
-    public StationLocation[] chromosome; // kromosom adalah array of bit, integer diperlakukan seperti array berisi
-                                         // (bit) 0/1
+    public StationLocation[] chromosome; // kromosom adalah array of station location
     public int fitness; // nilai fitnessnya
     public Random MyRand; // random generator dikirim dari luar untuk membuat invididu acal
     public double parentProbability; // probabilitas individu ini terpilih sbg parent
@@ -21,7 +20,6 @@ public class Individual implements Comparable<Individual> {
     // membuat individu acak
     public Individual(Random MyRand) {
         this.MyRand = MyRand;
-        // this.banyakFireStation = banyakFireStation;
         this.chromosome = generateRandomCoordinates();
         this.fitness = setFitness(chromosome);
         this.parentProbability = 0;
@@ -76,12 +74,14 @@ public class Individual implements Comparable<Individual> {
         return stationCoordinates;
     }
 
+    // Method bantuan untuk generateRandomCoordinates (Memastikan koordinat valid)
     static boolean isValidCoordinate(int x, int y) {
         if (map[x][y] == 0)
             return true;
         return false;
     }
 
+    // Method bantuan untuk generateRandomCoordinates (menentukan apakah koordinat sudah pernah dikunjungi atau belum)
     static boolean notChosenYet(int x, int y, StationLocation[] neighborCoordinates) {
         for (int i = 0; i < neighborCoordinates.length; i++) {
             if (x == neighborCoordinates[i].getX() && y == neighborCoordinates[i].getY())
@@ -90,6 +90,7 @@ public class Individual implements Comparable<Individual> {
         return true;
     }
 
+    // Method helper untuk BFS (pengecekan tanah kosong)
     static boolean isValid(int row, int col) {
         return row >= 0 && row < map.length &&
                 col >= 0 && col < map[0].length &&
