@@ -60,7 +60,7 @@ public class Main {
 		Random init = new Random(); // random generator untuk membuat seed
 		int bestFitness = Integer.MAX_VALUE;
 		Individual bestState = null;
-		long seed = 69; //init.nextLong() % 1000; // simpan seed sebagai seed untuk random generator
+		long seed = init.nextLong() % 1000; // simpan seed sebagai seed untuk random generator
 		Random gen = new Random(seed); // random generator untuk algogen-nya
 
 		for (int ct = 1; ct <= loop; ct++) {
