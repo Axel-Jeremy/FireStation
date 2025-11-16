@@ -71,7 +71,6 @@ public class Main {
 
         while (i++ <= runs) { // lakukan sebanyak runs kali
             // System.out.printf("Run %d\n", i - 1);
-            // hasil SA terbaik
             StationLocation[] currentState = sa.simulatedAnnealing(starting_temp, cooling_rate,
                     stopping_temp, stepSize);
             double currentF = sa.f(currentState); // hitung f(x) dari hasil SA
@@ -82,8 +81,6 @@ public class Main {
             // for (int k = 0; k < currentState.length; k++) {
             //     System.out.printf("Firestation #%d : %s",k+1, currentState[k]);
             // }
-
-            // System.out.println("----------------------------------------------------------");
 
             if (currentF < bestF) { // simpan f(x) terbaik;
                 bestF = currentF;
