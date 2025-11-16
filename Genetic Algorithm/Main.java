@@ -102,7 +102,7 @@ public class Main {
 		System.out.println("Seed: " + seed);
 		System.out.println("======================================");
 
-		System.out.printf("Best F: %.5f\n", ((1.0 * bestFitness) / (1.0 * h)));
+		System.out.printf("Best F: %.5f\n", (1.0 * bestFitness));
 		System.out.printf("p: %d, Average: %.5f\n", p, ((1.0 * bestFitness) / (1.0 * h)));
 		System.out.println("======================================");
 
