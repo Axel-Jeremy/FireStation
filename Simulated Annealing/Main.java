@@ -62,7 +62,7 @@ public class Main {
         int i = 1;
 
         Random init = new Random(); // random generator untuk membuat seed
-        long seed = 69; // simpan seed sebagai seed untuk random generator
+        long seed = init.nextLong() % 1000; // seed untuk random generator
 
         MySA sa = new MySA(seed, houseLocations, p, h, map);
 
