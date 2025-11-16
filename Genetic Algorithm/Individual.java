@@ -23,12 +23,6 @@ public class Individual implements Comparable<Individual> {
         this.MyRand = MyRand;
         // this.banyakFireStation = banyakFireStation;
         this.chromosome = generateRandomCoordinates();
-
-        // System.out.println("=================");
-        // for(int i = 0; i < chromosome.length; i++){
-        // System.out.println(chromosome[i]);
-        // }
-
         this.fitness = setFitness(chromosome);
         this.parentProbability = 0;
 
@@ -52,7 +46,6 @@ public class Individual implements Comparable<Individual> {
     public Individual(Random MyRand, StationLocation[] chromosome) {
         this.MyRand = MyRand;
         this.chromosome = chromosome;
-
         this.fitness = setFitness(chromosome);
         this.parentProbability = 0;
     }
@@ -117,13 +110,13 @@ public class Individual implements Comparable<Individual> {
         // Queue Multi-Source BFS
         Queue<Coordinate> q = new LinkedList<>();
 
-        // Tambahkan semua stasiun sebagai sumber
+        // Tambahkan semua stasiun sebagai sumber (titik awal)
         for (StationLocation station : fireStation) {
             int r = station.getX();
             int c = station.getY();
 
             // Pastikan stasiun valid (dalam peta dan bukan di pohon)
-            // Stasiun bisa di jalan (0) atau di rumah (1)
+            // Stasiun hanya bisa di jalan (0)
             if (isValid(r, c)) {
                 if (dist[r][c] == Integer.MAX_VALUE) { // Hindari duplikat jika 2 stasiun di 1 titik
                     dist[r][c] = 0;
@@ -160,8 +153,7 @@ public class Individual implements Comparable<Individual> {
             int r = house.getX();
             int c = house.getY();
 
-            // Ambil jarak langsung ke sel rumah,
-            // karena BFS kita sekarang bisa berjalan di atas rumah (1)
+            // Ambil jarak langsung ke sel rumah
             int costToThisHouse = dist[r][c];
 
             // Cek jika rumah ini tidak terjangkau oleh firestation
@@ -193,20 +185,16 @@ public class Individual implements Comparable<Individual> {
     }
 
     // single point crossover
-    // di sini hanya menghasilkan satu anak, crossover harusnya menghasilkan dua
-    // anak
-    // kemudian pilihannya bisa diambil anak terbaik saja, atau kedua anak masuk ke
-    // dalam populasi berikutnya
     public Individual[] doCrossover(Individual other) {
-        // 1. Buat array kromosom BARU untuk anak-anak
+        // Buat array kromosom baru untuk anak-anak
         StationLocation[] child1Chromosome = new StationLocation[banyakFireStation];
         StationLocation[] child2Chromosome = new StationLocation[banyakFireStation];
 
-        // 2. Tentukan titik potong (logika Anda sudah OK)
+        // Tentukan titik potong
         int rangeIndex = (int) (Math.ceil(((banyakFireStation * 1.0) / 3.0)));
         int potongan = this.MyRand.nextInt(rangeIndex) + rangeIndex;
 
-        // 3. Lakukan crossover dengan menyalin gen (DEEP COPY)
+        // Lakukan crossover dengan menyalin gen
         for (int i = 0; i < banyakFireStation; i++) {
             if (i <= potongan) {
                 // Anak 1 mengambil dari Parent 1 (this)
@@ -221,7 +209,7 @@ public class Individual implements Comparable<Individual> {
             }
         }
 
-        // 4. Buat objek Individual BARU dengan kromosom baru yang aman
+        // Buat objek Individual baru dengan kromosom baru yang aman
         Individual child1 = new Individual(this.MyRand, child1Chromosome);
         Individual child2 = new Individual(this.MyRand, child2Chromosome);
 
