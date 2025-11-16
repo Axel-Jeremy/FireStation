@@ -5,11 +5,9 @@ public class Population {
     private int maxPopulationSize;
     private int populationSize = 0;
     public double elitismPct;
-    // ArrayList<Item> listOfItems;
-    int maxCapacity;
+    int maxCapacity; // banyak firestation yang di deklarasi
     int sumRank = 0;
     Random MyRand;
-    public int banyakFireStation; // banyak firestation yang di deklarasi
     static int[][] map;
 
     public Population(Random MyRand, int maxCapacity, int maxPopulationSize,
@@ -19,14 +17,13 @@ public class Population {
         this.maxPopulationSize = maxPopulationSize;
         this.population = new ArrayList<Individual>();
         this.elitismPct = elitismPct;
-        // this.banyakFireStation = maxCapacity;
         this.maxCapacity = maxCapacity;
         for (int i = 1; i <= this.maxPopulationSize; i++)
             this.sumRank = this.sumRank + i;
 
     }
 
-    public void randomPopulation() {
+    public void randomPopulation() { 
         for (int i = 0; i < this.maxPopulationSize; i++) {
             this.addIndividual(new Individual(this.MyRand));
         }
@@ -69,29 +66,6 @@ public class Population {
         return this.maxPopulationSize == this.populationSize;
     }
 
-    /*
-     * public Individual[] selectParent() { //rank selection
-     * Individual[] parents = new Individual[2];
-     * this.population.sort((idv1,idv2) -> idv1.compareTo(idv2));
-     * int top = this.population.size()+1;
-     * for (int i=0;i<this.population.size();i++) {
-     * ((Individual)this.population.get(i)).parentProbability =
-     * (1.0*top)/this.sumRank;
-     * }
-     * for (int n = 0;n<2;n++) {
-     * int i=-1;
-     * double prob = this.MyRand.nextDouble();
-     * double sum = 0.0;
-     * do {
-     * i++;
-     * sum = sum + this.population.get(i).parentProbability;
-     * } while(sum<prob);
-     * parents[n] = this.population.get(i);
-     * }
-     * return parents;
-     * }
-     */
-
     // pemilihan 2 parent dengan teknik roulette wheel
     public Individual[] selectParent() {
         Individual[] parents = new Individual[2];
@@ -108,7 +82,7 @@ public class Population {
                     - ((1.0 * this.population.get(i).fitness) / sumfitness);
         }
 
-        // Kode untuk roulette
+        // Kode untuk roulette wheel selection
         for (int n = 0; n < 2; n++) {
             int i = -1;
             double prob = this.MyRand.nextDouble();
@@ -122,6 +96,7 @@ public class Population {
         return parents;
     }
 
+    //rank selection
     public Individual[] selectParentByRank() {
         Individual[] parents = new Individual[2];
         int N = this.population.size();
@@ -143,7 +118,7 @@ public class Population {
             this.population.get(i).parentProbability = (double) rank / this.sumRank;
         }
 
-        // 3. lakukan "Roulette Wheel" pada Peringkat (Rank).
+        // lakukan "Roulette Wheel" pada Peringkat (Rank).
         // loop ini memilih 2 parent.
         for (int n = 0; n < 2; n++) {
             double prob = this.MyRand.nextDouble();
