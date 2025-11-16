@@ -36,13 +36,13 @@ public class MySA {
         // Queue Multi-Source BFS
         Queue<Coordinate> q = new LinkedList<>();
 
-        // Tambahkan semua stasiun sebagai sumber
+        // Tambahkan semua stasiun sebagai sumber (titik awal)
         for (StationLocation station : fireStation) {
             int r = station.getX();
             int c = station.getY();
 
             // Pastikan stasiun valid (dalam peta dan bukan di pohon)
-            // Stasiun bisa di jalan (0) atau di rumah (1)
+            // Stasiun hanya bisa di jalan (0)
             if (isValid(r, c)) {
                 if (dist[r][c] == Integer.MAX_VALUE) { // Hindari duplikat jika 2 stasiun di 1 titik
                     dist[r][c] = 0;
@@ -91,7 +91,7 @@ public class MySA {
                 // Jika stasiun di atas rumah, costToThisHouse == 0
                 // Jika stasiun 5 langkah, costToThisHouse == 5
                 // Tidak perlu +1, karena jaraknya sudah dihitung ke sel rumah
-                totalCost += costToThisHouse;
+                totalCost += costToThisHouse; //tambahkan seluruh jarak ke rumah dari firestation
             }
         }
         return totalCost + unreachedHouse * (map.length * map[0].length);
@@ -175,8 +175,7 @@ public class MySA {
     }
 
     private static boolean notChosenYet(int x, int y, StationLocation[] neighborCoordinates) { // cek apakah x dan y
-                                                                                               // udah
-        // dipilih
+                                                                                               // udah dipilih
         for (int i = 0; i < neighborCoordinates.length; i++) {
             if (x == neighborCoordinates[i].getX()
                     && y == neighborCoordinates[i].getY())
@@ -192,13 +191,6 @@ public class MySA {
         return x >= 0 && x < map.length && y >= 0 && y < map[0].length;
     }
 
-    // // pastikan x ada diantara MAX_X dan MIN_X;
-    // static double clamp(double x) {
-    // x = Math.max(MIN_X, x);
-    // x = Math.min(x, MAX_X);
-    // return x;
-    // }
-
     public StationLocation[] simulatedAnnealing(double t0, double cooling, double stopping_temp, double stepSize) {
         StationLocation[] randPos = generateRandomCoordinates(); // posisi awal random
         double currentF = f(randPos);
@@ -213,10 +205,8 @@ public class MySA {
         while (true) { // sampai lebih kecil dari stopping_temp atau bisa diiterasi juga
             if (T < stopping_temp)
                 break;
-            // successor state: "perturbation" via gaussian (mean = 0, deviasi = stepSize)
-            // getneighbor\
 
-            currentStepSize = stepSize * (T / t0);
+            currentStepSize = stepSize * (T / t0); //hitung step size sekarang
             if (currentStepSize < 1.0)
                 currentStepSize = 1.0; // jangan sampai 0
 
@@ -275,9 +265,9 @@ public class MySA {
             }
 
             StationLocation[] successorFireStation = null;
-            int randomSuccessorIdx = rnd.nextInt(4);
+            int randomSuccessorIdx = rnd.nextInt(4); //index random successor yang diambil
 
-            while (successorFireStation == null) {
+            while (successorFireStation == null) { 
                 randomSuccessorIdx = rnd.nextInt(4);
 
                 switch (randomSuccessorIdx) {
@@ -314,6 +304,10 @@ public class MySA {
         return bestState;
     }
 
+    
+
+    // ABAIKAN
+    
     // run: SA 100 0.999 0.0001 0.1
     // public static void main(String[] args) {
     // Scanner sc = new Scanner(System.in);
